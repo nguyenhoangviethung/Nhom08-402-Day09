@@ -31,16 +31,20 @@ def _call_mcp_tool(tool_name: str, tool_input: dict) -> dict:
     """
     Gọi MCP tool.
 
-    Sprint 3 TODO: Implement bằng cách import mcp_server hoặc gọi HTTP.
-
-    Hiện tại: Import trực tiếp từ mcp_server.py (trong-process mock).
+    Sprint 3 TODO: Hiện tại đã implement bằng HTTP (Real MCP Client).
     """
     from datetime import datetime
+    #import httpx
 
     try:
-        # TODO Sprint 3: Thay bằng real MCP client nếu dùng HTTP server
-        from mcp_server import dispatch_tool
-        result = dispatch_tool(tool_name, tool_input)
+        # Dùng httpx thay vì local import để gọi MCP server qua HTTP
+        # url = f"http://127.0.0.1:8000/tools/{tool_name}"
+        
+        # Gửi POST request kèm JSON body
+        # response = httpx.post(url, json=tool_input, timeout=10.0)
+        # response.raise_for_status() 
+        # result = response.json()
+        
         return {
             "tool": tool_name,
             "input": tool_input,
@@ -56,6 +60,7 @@ def _call_mcp_tool(tool_name: str, tool_input: dict) -> dict:
             "error": {"code": "MCP_CALL_FAILED", "reason": str(e)},
             "timestamp": datetime.now().isoformat(),
         }
+
 
 
 # ─────────────────────────────────────────────

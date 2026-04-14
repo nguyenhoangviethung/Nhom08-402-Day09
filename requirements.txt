@@ -10,25 +10,39 @@ torchvision
 # === Core ===
 python-dotenv>=1.0.0
 
-# === LLM Providers (chọn ít nhất một) ===
-openai>=1.0.0                    # Option A: OpenAI API
-google-generativeai>=0.5.0       # Option B: Google Gemini
+# ─── Vector Store ───────────────────────
+chromadb>=0.4.22
 
-# === Vector Store ===
-chromadb>=0.5.0                  # Vector database (local, không cần server)
+# ─── Embeddings ─────────────────────────
+# Option A: Sentence Transformers (offline, không cần API key)
+# Chỉ định nguồn tải PyTorch bản CPU để tránh tải bản CUDA nặng nề
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+sentence-transformers>=2.6.0
 
-# === Embeddings — chọn một trong hai ===
-# Option A: OpenAI Embeddings (dùng chung API key với LLM)
-# (đã có trong openai package)
+# ─── LLM ────────────────────────────────
+# Option A: OpenAI
+openai>=1.12.0
 
-# Option B: Sentence Transformers (local, không cần API key)
-sentence-transformers>=2.7.0     # Model: paraphrase-multilingual-MiniLM-L12-v2
+# Option B: Google Gemini
+# google-generativeai>=0.5.0
 
-# === Sprint 3: Sparse/Hybrid Retrieval ===
-rank-bm25>=0.2.2                 # BM25 keyword search
+# ─── Orchestration ──────────────────────
+# Option: LangGraph (uncomment nếu dùng LangGraph)
+langgraph>=0.1.0
+langchain>=0.2.0
+langchain-openai>=0.1.0
 
-# === Sprint 3: Rerank ===
-# sentence-transformers đã bao gồm CrossEncoder
+# ─── Data ───────────────────────────────
+pyyaml>=6.0.1
 
-# === Utils ===
-tqdm>=4.66.0                     # Progress bar khi index nhiều docs
+# ─── MCP (optional — Sprint 3 Bonus) ───
+# Uncomment nếu muốn implement real MCP server:
+mcp>=1.0.0
+httpx>=0.27.0
+fastapi>=0.110.0
+uvicorn>=0.27.0
+
+# ─── Dev/Test ───────────────────────────
+pytest>=8.0.0

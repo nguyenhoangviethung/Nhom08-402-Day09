@@ -328,10 +328,49 @@ def dispatch_tool(tool_name: str, tool_input: dict) -> dict:
 
 
 # ─────────────────────────────────────────────
+# HTTP Server (FastAPI) — Sprint 3 Bonus
+# ─────────────────────────────────────────────
+
+try:
+    from fastapi import FastAPI, Request
+    from fastapi.responses import JSONResponse
+
+    app = FastAPI(
+        title="MCP HTTP Server", 
+        description="REST Server exposes tools discovery and tool dispatching (Sprint 3)"
+    )
+
+    @app.get("/tools")
+    def api_list_tools():
+        return list_tools()
+
+    @app.post("/tools/{tool_name}")
+    async def api_dispatch_tool(tool_name: str, request: Request):
+        try:
+            tool_input = await request.json()
+        except:
+            tool_input = {}
+            
+        result = dispatch_tool(tool_name, tool_input)
+        if isinstance(result, dict) and "error" in result:
+            return JSONResponse(status_code=400, content=result)
+        return result
+
+except ImportError:
+    app = None
+    print("⚠️  FastAPI not installed. Install requirements.txt to run HTTP Server.")
+
+
+# ─────────────────────────────────────────────
 # Test & Demo
 # ─────────────────────────────────────────────
 
 if __name__ == "__main__":
+    import sys
+    
+    # Nếu được gọi cùng uvicorn (ví dụ debug run), fastapi app sẽ chạy.
+    # Khi chạy trực tiếp bằng \`python mcp_server.py\`, nó sẽ chạy CLI test demo cũ.
+    
     print("=" * 60)
     print("MCP Server — Tool Discovery & Test")
     print("=" * 60)
@@ -354,7 +393,7 @@ if __name__ == "__main__":
     print("\n🎫 Test: get_ticket_info")
     ticket = dispatch_tool("get_ticket_info", {"ticket_id": "P1-LATEST"})
     print(f"  Ticket: {ticket.get('ticket_id')} | {ticket.get('priority')} | {ticket.get('status')}")
-    if ticket.get("notifications_sent"):
+    if isinstance(ticket, dict) and ticket.get("notifications_sent"):
         print(f"  Notifications: {ticket['notifications_sent']}")
 
     # 4. Test check_access_permission
@@ -375,4 +414,5 @@ if __name__ == "__main__":
     print(f"  Error: {err.get('error')}")
 
     print("\n✅ MCP server test done.")
-    print("\nTODO Sprint 3: Implement HTTP server nếu muốn bonus +2.")
+    print("\n👉 To start real HTTP server run: uvicorn mcp_server:app --port 8000 --reload")
+
