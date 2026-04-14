@@ -1,6 +1,6 @@
 # System Architecture — Lab Day 09
 
-**Nhóm:** Nhom08-402  
+**Nhóm:** Nhóm 08  
 **Ngày:** 14/04/2026  
 **Version:** 1.0
 
@@ -8,74 +8,18 @@
 
 ## 1. Tổng quan kiến trúc
 
-> Mô tả ngắn hệ thống của nhóm: chọn pattern gì, gồm những thành phần nào.
-
-**Pattern đã chọn:** Supervisor-Worker  
+**Pattern đã chọn:** Supervisor-Worker kết hợp mạng lưới Tooling qua **MCP Server (HTTP REST)**.  
 **Lý do chọn pattern này (thay vì single agent):**
-
-Kiến trúc này cho phép chuyên môn hóa từng thành phần, tăng tính minh bạch trong việc ra quyết định (routing) và dễ dàng mở rộng tính năng mới thông qua MCP Tools mà không làm ảnh hưởng đến logic lõi của hệ thống. Ngoài ra, nó cung cấp khả năng gỡ lỗi (debug) nhanh chóng nhờ các Trace ghi lại lý do điều hướng.
+1. **Phân quyền trách nhiệm rõ ràng (Separation of Concerns):** Không phải nhồi nhét ngập ngụa prompt và tools vào một Agent duy nhất (dễ tràn token, hallucinate).
+2. **Khả năng quan sát (Observability):** Từng pipeline step (Routing -> Gọi Tool -> Bới DB -> Trả lời) đều được ghi log chi tiết. Dễ debug xem lỗi nằm ở khâu tìm kiếm (Retrieval) hay do LLM suy luận sai (Synthesis).
+3. **Mở rộng linh hoạt (Scalability):** Tích hợp khéo léo Client-Server với hệ MCP. Nếu công ty có Tool mới, chỉ cần khai báo ở Server bên ngoài, không cần đụng mã nguồn RAG.
 
 ---
 
 ## 2. Sơ đồ Pipeline
 
-> Vẽ sơ đồ pipeline dưới dạng text, Mermaid diagram, hoặc ASCII art.
-> Yêu cầu tối thiểu: thể hiện rõ luồng từ input → supervisor → workers → output.
-
-**Ví dụ (ASCII art):**
-```
-User Request
-     │
-     ▼
-┌──────────────┐
-│  Supervisor  │  ← route_reason, risk_high, needs_tool
-└──────┬───────┘
-       │
-   [route_decision]
-       │
-  ┌────┴────────────────────┐
-  │                         │
-  ▼                         ▼
-Retrieval Worker     Policy Tool Worker
-  (evidence)           (policy check + MCP)
-  │                         │
-  └─────────┬───────────────┘
-            │
-            ▼
-      Synthesis Worker
-        (answer + cite)
-            │
-            ▼
-         Output
-```
-
-**Sơ đồ thực tế của nhóm:**
-
-```
-User Request
-     │
-     ▼
-┌──────────────┐
-│  Supervisor  │  ← route_reason, risk_high, needs_tool
-└──────┬───────┘
-       │
-   [route_decision]
-       │
-  ┌────┴────────────────────┐
-  │                         │
-  ▼                         ▼
-Retrieval Worker     Policy Tool Worker
-  (evidence)           (policy check + MCP)
-  │                         │
-  └─────────┬───────────────┘
-            │
-            ▼
-      Synthesis Worker
-        (answer + cite)
-            │
-            ▼
-         Output
-```
+**Sơ đồ luồng thực thi quá trình của Hệ thống:**
+![alt text](pipeline.svg)
 
 ---
 
@@ -85,37 +29,37 @@ Retrieval Worker     Policy Tool Worker
 
 | Thuộc tính | Mô tả |
 |-----------|-------|
-| **Nhiệm vụ** | Phân tích ý định (intent) của người dùng và điều phối tác vụ đến Worker phù hợp. |
-| **Input** | Câu hỏi từ người dùng (task). |
+| **Nhiệm vụ** | Phân tích ý định câu hỏi (intent routing), định tuyến luồng xử lý và đánh giá rủi ro an toàn của task. |
+| **Input** | `AgentState` (Mảng thông tin chứa `task` - Câu hỏi đầu vào) |
 | **Output** | supervisor_route, route_reason, risk_high, needs_tool |
-| **Routing logic** | Sử dụng LLM Classifier để phân loại câu hỏi dựa trên mô tả nhiệm vụ và các ràng buộc về rủi ro. |
-| **HITL condition** | Kích hoạt khi phát hiện mã lỗi lạ (unknown error code) hoặc yêu cầu có tính nhạy cảm cao (risk_high). |
+| **Routing logic** | Rule-based (từ khoá). Chứa "hoàn tiền, cấp quyền, flash sale" -> Policy Tool. Chứa "khẩn cấp, err-" -> Risk High/HITL. Khác -> Retrieval. |
+| **HITL condition** | Khởi hoạt khi hệ thống nhận diện câu hỏi chứa mã lỗi lạ (`err-`). Node `human_review` sẽ chạy nhưng hiện tại đang mở chế độ Placeholder (Auto-approving) cho môi trường Lab, duyệt xong sẽ đẩy tiếp qua Retrieval. |
 
 ### Retrieval Worker (`workers/retrieval.py`)
 
 | Thuộc tính | Mô tả |
 |-----------|-------|
-| **Nhiệm vụ** | Tìm kiếm ngữ nghĩa và trích xuất bằng chứng từ Knowledge Base. |
-| **Embedding model** | text-embedding-004 |
-| **Top-k** | 3 - 5 chunks |
-| **Stateless?** | Yes |
+| **Nhiệm vụ** | Tìm kiếm dữ liệu trong ChromaDB (VectorDB) để trả về các đoạn text (chunks) chứng minh sát nhất với câu hỏi. |
+| **Embedding model** | Mặc định sử dụng Local Model: `bkai-foundation-models/vietnamese-bi-encoder` (thông qua SentenceTransformers). Chế độ dự phòng (Fallback): Nếu không tải được model local, ưu tiên 2 là `text-embedding-3-small` (OpenAI), ưu tiên 3 là Random Vectors. |
+| **Top-k** | Mặc định là 3 (có thể lên 5 nếu sử dụng chế độ hybrid search). |
+| **Stateless?** | **Yes** (Xử lý chuỗi độc lập, xong là quên, không nắm giữ cache trạng thái vòng đời sau khi export output). |
 
 ### Policy Tool Worker (`workers/policy_tool.py`)
 
 | Thuộc tính | Mô tả |
 |-----------|-------|
-| **Nhiệm vụ** | Kiểm tra chính sách và thực thi các logic nghiệp vụ phức tạp thông qua MCP. |
-| **MCP tools gọi** | search_kb, check_access_permission, get_ticket_info |
-| **Exception cases xử lý** | Truy cập trái phép, yêu cầu ngoài khung giờ, hoặc thiếu thông tin định danh. |
+| **Nhiệm vụ** | Gọi LLM đối chiếu quy định trong văn bản; đóng vai trò là Client thực hiện giao tiếp HTTP ra ngoại vi. |
+| **MCP tools gọi** | Gọi qua HTTP 8000: `search_kb`, `get_ticket_info`, `check_access_permission`. |
+| **Exception cases xử lý** | Đơn flash sale, sản phẩm kỹ thuật số/license key, hạn mức truy cập Level 3, xử lý ticket ưu tiên P1... |
 
 ### Synthesis Worker (`workers/synthesis.py`)
 
 | Thuộc tính | Mô tả |
 |-----------|-------|
-| **LLM model** | Gemini 1.5 Pro |
-| **Temperature** | 0.1 |
-| **Grounding strategy** | Chỉ sử dụng các chunks và kết quả tool đã được Worker cung cấp để tổng hợp câu trả lời. |
-| **Abstain condition** | Khi dữ liệu từ các Worker trả về không chứa thông tin để giải quyết task. |
+| **LLM model** | `gpt-4o-mini` (Bản mặc định lấy theo env) hoặc Gemini Flash 1.5. |
+| **Temperature** | `0.1` (Thiết lập giá trị siêu thấp để ngăn AI "chém gió" sinh hoang tưởng). |
+| **Grounding strategy** | Phân tách rạch ròi System Prompt, chèn "POLICY EXCEPTIONS" lên top trước "CONTEXT" để ép LLM ưu tiên ngoại lệ, ghi nguồn cite góc cuối. |
+| **Abstain condition** | Khi biến đầu vào chunk trống, LLM sẽ bị mồi nhử từ chối khéo: "Không đủ thông tin trong tài liệu nội bộ". Cùng việc bị trừ điểm Confidence. |
 
 ### MCP Server (`mcp_server.py`)
 
@@ -124,7 +68,7 @@ Retrieval Worker     Policy Tool Worker
 | search_kb | query, top_k | chunks, sources |
 | get_ticket_info | ticket_id | ticket details |
 | check_access_permission | access_level, requester_role | can_grant, approvers |
-| check_policy | policy_category | policy_details, constraints |
+| create_ticket | priority, title, description | ticket_id, url (Ticket giả lập) |
 
 ---
 
@@ -142,7 +86,9 @@ Retrieval Worker     Policy Tool Worker
 | mcp_tools_used | list | Tool calls đã thực hiện | policy_tool ghi |
 | final_answer | str | Câu trả lời cuối | synthesis ghi |
 | confidence | float | Mức tin cậy | synthesis ghi |
-| risk_high | bool | Cảnh báo rủi ro cao | supervisor ghi, HITL đọc |
+| workers_called | list | Lưu diễn biến (Trace) luồng worker nào đã chạy | Tất cả Node ghi (Append) |
+| history | list | Lưu nội dung nhật ký bằng chữ các mốc sự kiện | Lịch sử log (All nodes) |
+| risk_high / needs_tool | bool | Cờ hiệu cho biết tính chất nguy hiểm, nhu cầu ra Internet | supervisor ghi / policy đọc |
 
 ---
 
@@ -153,23 +99,21 @@ Retrieval Worker     Policy Tool Worker
 | Debug khi sai | Khó — không rõ lỗi ở đâu | Dễ hơn — test từng worker độc lập |
 | Thêm capability mới | Phải sửa toàn prompt | Thêm worker/MCP tool riêng |
 | Routing visibility | Không có | Có route_reason trong trace |
-| Tính giải trình | Thấp (Black box) | Cao (Clear reasoning path) |
-| Tính an toàn | Thấp (Dễ bị ảo giác) | Cao (Có HITL cho rủi ro cao) |
-| Tính mở rộng | Khó — phải sửa toàn prompt | Dễ — thêm worker/MCP tool riêng |
-| Tính song song | Không có | Có thể chạy song song các worker |
-| Tính linh hoạt | Thấp (Phải sửa toàn prompt) | Cao (Chỉ cần sửa worker tương ứng) |
-| Tính dễ debug | Khó — không rõ lỗi ở đâu | Dễ hơn — test từng worker độc lập |
+| Security (Bảo mật Tools) | Rủi ro một LLM bị Jailbreak rồi gọi nhầm hàm xoá DB. | Chỉ những Node chỉ định (Policy Worker) mới có quyền truy cập Tool ngoài. |
 
 **Nhóm điền thêm quan sát từ thực tế lab:**
 
-Trong quá trình test câu q09 về mã lỗi ERR-403-AUTH, hệ thống Multi-Agent đã nhận diện được đây là một "unknown code" và gán nhãn risk_high, giúp kích hoạt cơ chế kiểm duyệt thay vì cố gắng đưa ra một câu trả lời ảo giác như Single Agent.
+Sau khi chuyển sang kiến trúc Supervisor-Worker tích hợp MCP (FastAPI), mức độ chịu lỗi (Fault-Tolerance) hệ thống tăng hẳn. Giả dụ nếu `mcp_server.py` phản hồi trên 10s (timeout do sập mạng ngầm), chỉ có `policy_tool_worker` bị rớt log lỗi khâu đó, và Worker `synthesis` sau đó vẫn hoàn thành nốt luồng câu trả lời một cách êm đẹp dựa trên partial context. Đây là đặc tính cực kì đáng giá trong Production mà single agent cũ (gãy là gãy toàn tập) không có được.
 
 ---
 
-## 6. Giới hạn và điểm cần cải tiến
+## 6. Giới hạn và điểm cần cải tiến (Hướng code thực nghiệp)
 
-> Nhóm mô tả những điểm hạn chế của kiến trúc hiện tại.
+> Nhóm mô tả những điểm hạn chế của kiến trúc hiện tại và nêu ra hướng để làm thật.
 
-1. Độ trễ hệ thống (Latency): Do luồng xử lý phải đi qua nhiều bước trung gian, thời gian phản hồi tổng thể cao hơn so với việc gọi trực tiếp 1 LLM đơn lẻ.
-2. Chi phí vận hành: Việc sử dụng nhiều lượt gọi LLM để điều phối và tổng hợp làm tăng lượng token tiêu thụ, dẫn đến chi phí vận hành cao hơn.
-3. Sự phụ thuộc vào Supervisor: Nếu Supervisor phân loại sai ngay từ đầu, toàn bộ các bước sau sẽ không thể cho ra kết quả đúng. Cần cải tiến Prompt định tuyến hoặc sử dụng model mạnh hơn cho khâu này.
+1. **Routing quá cứng nhắc (Rule-based ở Supervisor):** File `graph.py` hiện tại định tuyến bằng cách bắt keyword `if any(kw in task...)`. Nếu user dùng từ đồng nghĩa, routing sẽ đi sai đường. 
+  * **Hướng thực thi:** Sửa hàm `supervisor_node()` thay vì `if-else` hãy gọi API gpt-4o-mini với chức năng Structure Output (Function Calling), để LLM tự quyết định route nào hợp lý nhất bằng Semantic hiểu biết.
+2. **Công cụ External ở MCP chỉ là Hardcode:** Các thông số `MOCK_TICKETS` trong `mcp_server.py` đang tạo ra bằng code cứng (dict) - không chạy thật với doanh nghiệp.
+  * **Hướng thực thi:** Bạn cần bổ sung thư viện `httpx` vào trong file `mcp_server.py`. Tìm hàm `tool_get_ticket_info(ticket_id)` -> Đổi nó thành gọi API nội bộ tới nền tảng Atlassian Jira của công ty (`POST /rest/api/3/issue/...` kèm Header chứa Token).
+3. **Môi trường mất trí nhớ - Thiếu Long-Term Memory:** Hiện tại Pipeline (graph.py) chỉ chạy dạng One-off (hỏi 1 câu trả lời 1 khối rồi tắt). Nó quên khuấy bối cảnh nếu user hỏi tiếp câu thứ 2 (Follow-up chat).
+  * **Hướng thực thi:** Bạn có thể cần bổ sung một Backend Memory (ví dụ dùng Redis, Sqlite hoặc Checkpointers của framework LangGraph gốc). `AgentState` sẽ cần nạp thêm property `"messages": list` lưu lại lịch sử hội thoại thay vì chỉ lưu 1 biến `task` thô.

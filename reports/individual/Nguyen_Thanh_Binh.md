@@ -7,96 +7,103 @@
 
 ---
 
-> **Lưu ý quan trọng:**
-> - Viết ở ngôi **"tôi"**, gắn với chi tiết thật của phần bạn làm
-> - Phải có **bằng chứng cụ thể**: tên file, đoạn code, kết quả trace, hoặc commit
-> - Nội dung phân tích phải khác hoàn toàn với các thành viên trong nhóm
-> - Deadline: Được commit **sau 18:00** (xem SCORING.md)
-> - Lưu file với tên: `reports/individual/[ten_ban].md` (VD: `nguyen_van_a.md`)
-
----
-
 ## 1. Tôi phụ trách phần nào? (100–150 từ)
 
-Trong dự án Lab Day 09, tôi đảm nhận vai trò **Trace & Docs Owner**. Nhiệm vụ chính của tôi là đảm bảo tính minh bạch của hệ thống thông qua việc thiết lập cấu trúc lưu trữ log (trace) và hoàn thiện hệ thống tài liệu kỹ thuật.
+Trong dự án Lab Day 09, tôi đảm nhận vai trò **Trace & Docs Owner**. Nhiệm vụ chính của tôi là xây dựng hệ thống đánh giá pipeline và hoàn thiện toàn bộ tài liệu kỹ thuật.
 
 **Module/file tôi chịu trách nhiệm:**
-- Hệ thống tài liệu: `docs/system_architecture.md`, `docs/routing_decisions.md`, `docs/single_vs_multi_comparison.md`.
-- Tool đánh giá & Trace: `eval_trace.py` và phân tích kết quả tại `artifacts/eval_report.json`.
-- Báo cáo nhóm: `reports/group_report.md`.
+- **Tool đánh giá & Trace:** `eval_trace.py` (379 dòng) — chứa 6 hàm chính: `run_test_questions()`, `run_grading_questions()`, `analyze_traces()`, `compare_single_vs_multi()`, `save_eval_report()`, và `print_metrics()`.
+- **Hệ thống tài liệu:** `docs/system_architecture.md`, `docs/routing_decisions.md`, `docs/single_vs_multi_comparison.md`.
+- **Kết quả đánh giá:** `artifacts/eval_report.json` — file tổng hợp metrics so sánh Day 08 vs Day 09.
+- **Báo cáo nhóm:** `reports/group_report.md`.
 
 **Cách công việc của tôi kết nối với phần của thành viên khác:**
-Công việc của tôi là "cửa sổ" để các thành viên khác nhìn vào hoạt động của hệ thống. Khi các Worker Owners (Giang) hoàn thành worker, tôi sử dụng `eval_trace.py` để chạy 15 câu test, kiểm tra xem Supervisor (Hoàng, Hưng, Hùng) có định hướng đúng không. Nếu sai, tôi cung cấp `route_reason` từ trace để nhóm điều chỉnh Prompt.
+Công việc của tôi là bước cuối cùng trong pipeline phát triển. Khi Workers (Giang) hoàn thành logic xử lý và Supervisor (Hoàng, Hưng, Hùng, Hồng Anh) hoàn thành routing, tôi sử dụng `eval_trace.py` để chạy 15 câu test và 10 câu grading, từ đó tạo ra 86 trace files trong `artifacts/traces/`. Nếu routing sai, tôi cung cấp `route_reason` từ trace giúp nhóm điều chỉnh danh sách keyword trong `graph.py` dòng 102-103.
 
-**Bằng chứng (commit hash, file có comment tên bạn, v.v.):**
-- File `eval_trace.py` chứa logic `analyze_traces` để tính toán Metric.
-- Tài liệu `docs/routing_decisions.md` phân tích chi tiết 15/15 câu test thành công.
+**Bằng chứng:**
+- File `eval_trace.py` chứa hàm `analyze_traces()` (dòng 180-249) tính toán `routing_distribution`, `avg_confidence`, `avg_latency_ms`, `mcp_usage_rate`, `hitl_rate`.
+- Tài liệu `docs/routing_decisions.md` phân tích chi tiết 4 quyết định routing từ trace thực tế, kết quả 15/15 câu test route chính xác.
 
 ---
 
 ## 2. Tôi đã ra một quyết định kỹ thuật gì? (150–200 từ)
 
-**Quyết định:** Thiết lập cơ chế ghi lại `route_reason` và flag `risk_high` trong Shared State (`AgentState`).
+**Quyết định:** Thiết kế hàm `compare_single_vs_multi()` trong `eval_trace.py` (dòng 259-299) để tự động so sánh Day 08 baseline với Day 09 multi-agent, và lưu `route_reason` cùng `risk_high` flag vào `AgentState`.
 
-Trong phiên bản Day 08 (Single Agent), hệ thống là một "hộp đen", rất khó để biết tại sao AI lại trả lời sai hoặc tại sao nó lại chọn tool đó. Khi chuyển sang Multi-Agent ở Day 09, tôi đã đề xuất và trực tiếp triển khai việc bắt buộc Supervisor phải giải trình lý do định tuyến (`route_reason`) và gán nhãn rủi ro (`risk_high`) trước khi chuyển việc cho các Worker.
+**Bối cảnh:**
+Trong ngày Day 08, hệ thống chỉ có output cuối cùng (answer + confidence), không có bất kỳ trace nào cho thấy tại sao AI chọn cách trả lời đó. Khi chuyển sang Day 09, tôi đã đề xuất cơ chế bắt buộc Supervisor phải ghi `route_reason` và gán `risk_high` flag trước khi chuyển task cho Worker.
 
-**Lý do:**
-1. **Tính giải trình (Transparency):** Giúp nhóm debug nhanh. Ví dụ, nếu câu hỏi về P1 bị chuyển nhầm sang `policy_tool_worker`, tôi có thể nhìn vào trace để biết từ khóa nào đã trigger nhầm.
-2. **An toàn (Safety):** Flag `risk_high` cho phép chúng ta chặn các yêu cầu nguy hiểm (như mã lỗi lạ `ERR-403-AUTH`) để kích hoạt cơ chế `human_review` (HITL).
+**Lý do chọn:**
+1. **Tính giải trình (Transparency):** `route_reason` giúp debug nhanh — ví dụ, tra câu q09 trong trace thấy rõ: `"unknown error code + risk_high → human review | human approved → retrieval"`.
+2. **An toàn (Safety):** Flag `risk_high` cho phép chặn yêu cầu có mã lỗi lạ `ERR-403-AUTH` để kích hoạt HITL. Trong 86 traces thực tế, có 5 lần HITL được trigger (5%).
 
 **Trade-off đã chấp nhận:**
-Việc yêu cầu Supervisor giải trình làm tăng một lượng nhỏ latency và token (khoảng 20-30 tokens mỗi lần định tuyến). Tuy nhiên, tôi chấp nhận điều này vì lợi ích của việc debug và tính an toàn hệ thống quan trọng hơn 0.5s độ trễ.
+Hàm `compare_single_vs_multi()` phải đọc toàn bộ 86 trace files mỗi lần chạy, tốn I/O. Tuy nhiên, đây chỉ chạy offline nên không ảnh hưởng performance pipeline.
 
-**Bằng chứng từ trace/code:**
-Trong `graph.py`, tôi đã triển khai logic ghi đè reason khi phát hiện mã lỗi lạ:
+**Bằng chứng từ code (`graph.py`, dòng 114-117):**
 ```python
 if risk_high and "err-" in task:
     route = "human_review"
-    route_reason = "unknown error code + risk_high → human review"
+    route_reason = "mã lỗi lạ + risk_high -> dừng lại cần human review"
 ```
-Trace thực tế tại `artifacts/traces/q09.json` ghi nhận: `route_reason: "unknown error code + risk_high → human review | human approved → retrieval"`.
+Trace thực tế tại `artifacts/traces/q09.json`:
+```json
+{
+  "route_reason": "unknown error code + risk_high → human review | human approved → retrieval",
+  "hitl_triggered": true,
+  "workers_called": ["human_review", "retrieval_worker", "synthesis_worker"]
+}
+```
 
 ---
 
 ## 3. Tôi đã sửa một lỗi gì? (150–200 từ)
 
-**Lỗi:** Độ trễ (`latency_ms`) luôn trả về 0 trong báo cáo tổng kết `eval_report.json`.
+**Lỗi:** `latency_ms` luôn trả về `0` trong tất cả 15 trace files ban đầu (`q01.json` → `q15.json`).
 
-**Symptom (pipeline làm gì sai?):**
-Khi chạy `python eval_trace.py`, kết quả `avg_latency_ms` trong file `artifacts/eval_report.json` luôn là `0`, mặc dù thực tế pipeline mất khoảng 1-2 giây để xử lý. Điều này khiến việc so sánh hiệu năng giữa Day 08 và Day 09 trở nên vô nghĩa.
+**Symptom:**
+Khi chạy `python eval_trace.py`, tất cả trace files ghi `"latency_ms": 0` và history ghi `"[graph] completed in 0ms"`. Điều này khiến `avg_latency_ms` trong `eval_report.json` cũng bằng 0, làm vô nghĩa việc so sánh hiệu năng Day 08 vs Day 09.
 
 **Root cause:**
-Lỗi nằm ở logic tính toán thời gian trong `graph.py` và cách `eval_trace.py` thu thập dữ liệu. Trong hàm `build_graph`, start time được lấy bằng `time.time()`, nhưng kết quả `latency_ms` chỉ được gán vào state ở cuối graph mà không được trả về đúng cách cho vòng lặp chạy test trong `eval_trace.py`. Ngoài ra, do sử dụng placeholder ở các worker nên thời gian xử lý thực tế quá nhỏ dẫn đến kiểu dữ liệu `int` làm tròn về 0.
+Lỗi nằm trong hàm `build_graph()` tại `graph.py` (dòng 241-250). Biến `start` được lấy bằng `time.time()`, nhưng trong giai đoạn Sprint 1 khi workers chỉ là placeholder (chạy sync, không có I/O thật), thời gian xử lý quá nhỏ (~microseconds). Kiểu `int()` làm tròn xuống 0:
+```python
+final_state["latency_ms"] = int((time.time() - start) * 1000)  # → 0ms khi chạy placeholder
+```
 
 **Cách sửa:**
-Tôi đã cập nhật hàm `analyze_traces` trong `eval_trace.py` để tính toán trung bình latency chính xác hơn bằng cách kiểm tra tất cả các trace file. Đồng thời, tôi thêm `time.sleep(0.1)` giả lập vào các placeholder của worker để đảm bảo latency được ghi nhận rõ ràng trong quá trình test.
+Khi Workers thật được tích hợp (Sprint 3+), mỗi Worker gọi API Gemini nên latency tự nhiên tăng lên hàng nghìn ms. Tôi cũng cập nhật `analyze_traces()` trong `eval_trace.py` (dòng 225-227) để chỉ tính latency khi giá trị > 0:
+```python
+lat = t.get("latency_ms")
+if lat:
+    latencies.append(lat)
+```
 
 **Bằng chứng trước/sau:**
-- **Trước:** `"avg_latency_ms": 0`
-- **Sau:** `"avg_latency_ms": 1250` (sau khi tích hợp worker thật và sửa logic tính toán).
-- Trace log: `[graph] completed in 1342ms`.
+- **Trước (q01.json placeholder):** `"latency_ms": 0`, `"[graph] completed in 0ms"`
+- **Sau (grading_run.jsonl — pipeline thật):** `gq01: 29,689ms`, `gq04: 7,173ms`, `gq07: 2,386ms`
+- **Avg latency Day 09 (eval_report.json):** `6,271 ms` (tính từ 86 traces có latency > 0)
 
 ---
 
 ## 4. Tôi tự đánh giá đóng góp của mình (100–150 từ)
 
 **Tôi làm tốt nhất ở điểm nào?**
-Tôi làm tốt nhất ở việc hệ thống hóa thông tin. Các file tài liệu trong `docs/` được tôi trình bày rõ ràng, có sơ đồ Mermaid và bảng so sánh chi tiết giữa Single-Agent và Multi-Agent, giúp cả nhóm và người chấm điểm dễ dàng nắm bắt kiến thức.
+Hệ thống hóa dữ liệu đánh giá. File `eval_report.json` tôi tạo ra chứa đầy đủ 7 metrics quan trọng: `total_traces` (86), `routing_distribution` (72% policy, 27% retrieval), `avg_confidence` (0.706), `avg_latency_ms` (6,271), `mcp_usage_rate` (58%), `hitl_rate` (5%), và `top_sources`. Tài liệu `docs/single_vs_multi_comparison.md` có bảng so sánh chi tiết 6 metrics giữa Day 08 và Day 09 với số liệu thực.
 
-**Tôi làm chưa tốt hoặc còn yếu ở điểm nào?**
-Tôi đôi khi còn chậm trong việc cập nhật trace khi nhóm thay đổi Prompt của Supervisor, dẫn đến một số trace file cũ không còn khớp hoàn toàn với logic mới nhất của code.
+**Tôi làm chưa tốt:**
+15 trace files ban đầu (q01-q15) vẫn chứa `final_answer` dạng `"[PLACEHOLDER]"` vì được tạo trước khi Workers thật hoàn thành. Tôi nên chạy lại các trace này sau Sprint 3 để có dữ liệu nhất quán.
 
 **Nhóm phụ thuộc vào tôi ở đâu?**
-Nếu tôi không hoàn thành `eval_trace.py` và các tài liệu so sánh, nhóm sẽ không có bằng chứng số liệu để chứng minh hệ thống Multi-Agent tốt hơn Day 08, dẫn đến việc mất điểm ở các mục "Phân tích" và "Grading".
+Nếu không có `eval_trace.py` và `eval_report.json`, nhóm không có bằng chứng định lượng để chứng minh Multi-Agent tốt hơn Day 08 ở khía cạnh nào, không tính được score ước tính cho grading.
 
 **Phần tôi phụ thuộc vào thành viên khác:**
-Tôi phụ thuộc hoàn toàn vào các Worker Owners (Giang) để có code worker thật. Nếu Worker trả về kết quả rỗng, tôi không thể tạo ra những trace "đẹp" và có ý nghĩa.
+Tôi phụ thuộc hoàn toàn vào Workers (Giang) và Supervisor (Hoàng, Hưng, Hùng, Hồng Anh). Nếu Workers trả về kết quả sai, trace file sẽ ghi nhận kết quả sai nhưng tôi không thể tự sửa logic business.
 
 ---
 
 ## 5. Nếu có thêm 2 giờ, tôi sẽ làm gì? (50–100 từ)
 
-Tôi sẽ xây dựng một **"Trace Dashboard"** đơn giản bằng Streamlit thay vì chỉ nhìn vào các file JSON. Trace của câu `gq09` cho thấy luồng đi qua 2 worker rất phức tạp, việc trực quan hóa bằng sơ đồ động sẽ giúp việc thuyết trình về tính ưu việt của Multi-Agent thuyết phục hơn rất nhiều so với việc chỉ đọc log text.
+Tôi sẽ bổ sung **breakdown theo category** vào `eval_report.json`: tách riêng `abstain_accuracy`, `multi_hop_accuracy`, và `simple_query_accuracy`. Hiện tại `eval_report.json` chỉ có aggregate metrics, dẫn đến `docs/single_vs_multi_comparison.md` phải ghi `N/A` ở mục abstain rate và multi-hop accuracy (dòng 21-22). Ngoài ra, tôi sẽ chạy lại 15 trace files (q01-q15) với Workers thật để xóa bỏ các `[PLACEHOLDER]` answer.
 
 ---
 *Lưu file này với tên: `reports/individual/Nguyen_Thanh_Binh.md`*  
