@@ -1,33 +1,49 @@
 {
-  "generated_at": "2026-04-14T11:09:24.246001",
+  "generated_at": "2026-04-14T16:52:11.501824",
   "day08_single_agent": {
     "total_questions": 15,
-    "avg_confidence": 0.86,
+    "avg_confidence": 0.0,
     "avg_latency_ms": 0,
-    "abstain_rate": "1/10 (10%)",
-    "multi_hop_accuracy": "0/2 (0%)"
+    "abstain_rate": "?",
+    "multi_hop_accuracy": "?"
   },
   "day09_multi_agent": {
-    "total_traces": 15,
+    "total_traces": 71,
     "routing_distribution": {
-      "retrieval_worker": "8/15 (53%)",
-      "policy_tool_worker": "7/15 (46%)"
+      "policy_tool_worker": "55/71 (77%)",
+      "retrieval_worker": "16/71 (22%)"
     },
-    "avg_confidence": 0.75,
-    "avg_latency_ms": 0,
-    "mcp_usage_rate": "0/15 (0%)",
-    "hitl_rate": "1/15 (6%)",
+    "avg_confidence": 0.696,
+    "avg_latency_ms": 6271,
+    "mcp_usage_rate": "50/71 (70%)",
+    "hitl_rate": "4/71 (5%)",
     "top_sources": [
       [
+        "support/sla-p1-2026.pdf",
+        12
+      ],
+      [
+        "it/access-control-sop.md",
+        12
+      ],
+      [
+        "support/helpdesk-faq.md",
+        8
+      ],
+      [
+        "hr/leave-policy-2026.pdf",
+        8
+      ],
+      [
         "sla_p1_2026.txt",
-        15
+        5
       ]
     ]
   },
   "analysis": {
     "routing_visibility": "Day 09 có route_reason cho từng câu → dễ debug hơn Day 08",
-    "latency_delta": "Không có sự khác biệt đáng kể (~0ms). Hệ thống Multi-agent vẫn duy trì được tốc độ xử lý nhanh tương đương Single-agent.",
-    "accuracy_delta": "100% (15/15) câu hỏi test được định tuyến chính xác đến đúng Worker chuyên trách.",
+    "latency_delta": "TODO: Điền delta latency thực tế",
+    "accuracy_delta": "",
     "debuggability": "Multi-agent: có thể test từng worker độc lập. Single-agent: không thể.",
     "mcp_benefit": "Day 09 có thể extend capability qua MCP không cần sửa core. Day 08 phải hard-code."
   }

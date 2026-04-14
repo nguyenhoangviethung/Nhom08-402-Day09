@@ -1,0 +1,106 @@
+{
+  "task": "ERR-403-AUTH là lỗi gì và cách xử lý?",
+  "route_reason": "mã lỗi lạ + risk_high -> dừng lại cần human review | human approved → retrieval",
+  "risk_high": true,
+  "needs_tool": false,
+  "hitl_triggered": true,
+  "retrieved_chunks": [
+    {
+      "text": "Escalation chỉ áp dụng khi cần thay đổi quyền hệ thống ngoài quy trình thông thường.\nVí dụ: Khẩn cấp trong sự cố P1, cần cấp quyền tạm thời để fix incident.\n\nQuy trình escalation khẩn cấp:\n1. On-call IT Admin có thể cấp quyền tạm thời (max 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24 giờ, phải có ticket chính thức hoặc quyền bị thu hồi tự động.\n3. Mọi quyền tạm thời phải được ghi log vào hệ thống Security Audit.",
+      "source": "it/access-control-sop.md",
+      "score": 0.209,
+      "metadata": {
+        "source": "it/access-control-sop.md",
+        "access": "internal",
+        "department": "IT Security",
+        "section": "Section 4: Escalation khi cần thay đổi quyền hệ thống",
+        "effective_date": "2026-01-01"
+      }
+    },
+    {
+      "text": "P1 — CRITICAL (Khẩn cấp):\nĐịnh nghĩa: Sự cố ảnh hưởng toàn bộ hệ thống production, không có workaround.\nVí dụ: Database sập, API gateway down, toàn bộ người dùng không thể đăng nhập.\n\nP2 — HIGH (Nghiêm trọng):\nĐịnh nghĩa: Sự cố ảnh hưởng một phần hệ thống, có workaround tạm thời.\nVí dụ: Một số tính năng không hoạt động, ảnh hưởng một nhóm người dùng.\n\nP3 — MEDIUM (Trung bình):\nĐịnh nghĩa: Lỗi ảnh hưởng không đáng kể, người dùng vẫn làm việc được.\n\nP4 — LOW (Thấp):\nĐịnh nghĩa: Yêu cầu cải tiến, gợi ý, hoặc lỗi giao diện nhỏ.",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.1758,
+      "metadata": {
+        "access": "internal",
+        "department": "IT",
+        "source": "support/sla-p1-2026.pdf",
+        "section": "Phần 1: Định nghĩa mức độ ưu tiên",
+        "effective_date": "2026-01-15"
+      }
+    },
+    {
+      "text": "Bước 1: Tiếp nhận\nOn-call engineer nhận alert hoặc ticket, xác nhận severity trong 5 phút.\n\nBước 2: Thông báo\nGửi thông báo tới Slack #incident-p1 và email incident@company.internal ngay lập tức.\n\nBước 3: Triage và phân công\nLead Engineer phân công engineer xử lý trong 10 phút.\n\nBước 4: Xử lý\nEngineer cập nhật tiến độ lên ticket mỗi 30 phút. Nếu cần hỗ trợ thêm, escalate ngay.\n\nBước 5: Resolution\nSau khi khắc phục, viết incident report trong vòng 24 giờ.",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.1594,
+      "metadata": {
+        "access": "internal",
+        "source": "support/sla-p1-2026.pdf",
+        "effective_date": "2026-01-15",
+        "department": "IT",
+        "section": "Phần 3: Quy trình xử lý sự cố P1"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "support/sla-p1-2026.pdf",
+    "it/access-control-sop.md"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Không đủ thông tin trong tài liệu nội bộ về lỗi ERR-403-AUTH và cách xử lý cụ thể của nó. [1] [2] [3]",
+  "sources": [
+    "support/sla-p1-2026.pdf",
+    "it/access-control-sop.md"
+  ],
+  "confidence": 0.1,
+  "history": [
+    "[supervisor] received task: ERR-403-AUTH là lỗi gì và cách xử lý?",
+    "[supervisor] route=human_review reason=mã lỗi lạ + risk_high -> dừng lại cần human review",
+    "[human_review] HITL triggered — awaiting human input",
+    "[retrieval_worker] called",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.1",
+    "[graph] completed in 1833ms"
+  ],
+  "workers_called": [
+    "human_review",
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 1833,
+  "run_id": "run_20260414_161333",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "ERR-403-AUTH là lỗi gì và cách xử lý?",
+        "top_k": 3,
+        "mode": "dense"
+      },
+      "output": {
+        "retrieved_chunks_count": 3,
+        "retrieved_sources": [
+          "support/sla-p1-2026.pdf",
+          "it/access-control-sop.md"
+        ]
+      }
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "ERR-403-AUTH là lỗi gì và cách xử lý?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "Không đủ thông tin trong tài liệu nội bộ về lỗi ER...",
+        "sources": [
+          "support/sla-p1-2026.pdf",
+          "it/access-control-sop.md"
+        ],
+        "confidence": 0.1
+      }
+    }
+  ],
+  "question_id": "q09"
+}

@@ -1,0 +1,108 @@
+{
+  "task": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
+  "route_reason": "default route",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "Q: Tôi quên mật khẩu, phải làm gì?\nA: Truy cập https://sso.company.internal/reset hoặc liên hệ Helpdesk qua ext. 9000. Mật khẩu mới sẽ được gửi qua email công ty trong vòng 5 phút.\n\nQ: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?\nA: Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, liên hệ IT Helpdesk hoặc tự reset qua portal SSO.\n\nQ: Mật khẩu cần thay đổi định kỳ không?\nA: Có. Mật khẩu phải được thay đổi mỗi 90 ngày. Hệ thống sẽ nhắc nhở 7 ngày trước khi hết hạn.",
+      "source": "support/helpdesk-faq.md",
+      "score": 0.4278,
+      "metadata": {
+        "source": "support/helpdesk-faq.md",
+        "department": "IT",
+        "effective_date": "2026-01-20",
+        "access": "internal",
+        "section": "Section 1: Tài khoản và mật khẩu"
+      }
+    },
+    {
+      "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.2496,
+      "metadata": {
+        "section": "Phần 2: SLA theo mức độ ưu tiên",
+        "department": "IT",
+        "source": "support/sla-p1-2026.pdf",
+        "access": "internal",
+        "effective_date": "2026-01-15"
+      }
+    },
+    {
+      "text": "Bước 1: Nhân viên tạo Access Request ticket trên Jira (project IT-ACCESS).\nBước 2: Line Manager phê duyệt yêu cầu trong 1 ngày làm việc.\nBước 3: IT Admin kiểm tra compliance và cấp quyền.\nBước 4: IT Security review với Level 3 và Level 4.\nBước 5: Nhân viên nhận thông báo qua email khi quyền được cấp.",
+      "source": "it/access-control-sop.md",
+      "score": 0.2329,
+      "metadata": {
+        "section": "Section 3: Quy trình yêu cầu cấp quyền",
+        "access": "internal",
+        "department": "IT Security",
+        "effective_date": "2026-01-01",
+        "source": "it/access-control-sop.md"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "support/sla-p1-2026.pdf",
+    "support/helpdesk-faq.md",
+    "it/access-control-sop.md"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, bạn cần liên hệ IT Helpdesk hoặc tự reset qua portal SSO. [1]",
+  "sources": [
+    "support/sla-p1-2026.pdf",
+    "support/helpdesk-faq.md",
+    "it/access-control-sop.md"
+  ],
+  "confidence": 0.91,
+  "history": [
+    "[supervisor] received task: Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
+    "[supervisor] route=retrieval_worker reason=default route",
+    "[retrieval_worker] called",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.91",
+    "[graph] completed in 25192ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 25192,
+  "run_id": "run_20260414_162708",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
+        "top_k": 3,
+        "mode": "dense"
+      },
+      "output": {
+        "retrieved_chunks_count": 3,
+        "retrieved_sources": [
+          "support/sla-p1-2026.pdf",
+          "support/helpdesk-faq.md",
+          "it/access-control-sop.md"
+        ]
+      }
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiế...",
+        "sources": [
+          "support/sla-p1-2026.pdf",
+          "support/helpdesk-faq.md",
+          "it/access-control-sop.md"
+        ],
+        "confidence": 0.91
+      }
+    }
+  ],
+  "question_id": "q04"
+}

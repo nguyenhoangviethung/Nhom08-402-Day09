@@ -1,0 +1,104 @@
+{
+  "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+  "route_reason": "default route",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camera bật trong các cuộc họp team.",
+      "source": "hr/leave-policy-2026.pdf",
+      "score": 0.5133,
+      "metadata": {
+        "department": "HR",
+        "access": "internal",
+        "effective_date": "2026-01-01",
+        "source": "hr/leave-policy-2026.pdf",
+        "section": "Phần 4: Remote work policy"
+      }
+    },
+    {
+      "text": "v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.2438,
+      "metadata": {
+        "access": "internal",
+        "effective_date": "2026-01-15",
+        "department": "IT",
+        "section": "Phần 5: Lịch sử phiên bản",
+        "source": "support/sla-p1-2026.pdf"
+      }
+    },
+    {
+      "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.1974,
+      "metadata": {
+        "source": "support/sla-p1-2026.pdf",
+        "section": "Phần 2: SLA theo mức độ ưu tiên",
+        "access": "internal",
+        "department": "IT",
+        "effective_date": "2026-01-15"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "support/sla-p1-2026.pdf",
+    "hr/leave-policy-2026.pdf"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần. Tuy nhiên, lịch remote phải được Team Lead phê duyệt qua HR Portal. Ngoài ra, ngày onsite bắt buộc là Thứ 3 và Thứ 5 theo lịch team. [hr/leave-policy-2026.pdf]",
+  "sources": [
+    "support/sla-p1-2026.pdf",
+    "hr/leave-policy-2026.pdf"
+  ],
+  "confidence": 0.51,
+  "history": [
+    "[supervisor] received task: Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+    "[supervisor] route=retrieval_worker reason=default route",
+    "[retrieval_worker] called",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.51",
+    "[graph] completed in 2564ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 2564,
+  "run_id": "run_20260414_161316",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "top_k": 3,
+        "mode": "dense"
+      },
+      "output": {
+        "retrieved_chunks_count": 3,
+        "retrieved_sources": [
+          "support/sla-p1-2026.pdf",
+          "hr/leave-policy-2026.pdf"
+        ]
+      }
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "Nhân viên sau probation period có thể làm remote t...",
+        "sources": [
+          "support/sla-p1-2026.pdf",
+          "hr/leave-policy-2026.pdf"
+        ],
+        "confidence": 0.51
+      }
+    }
+  ],
+  "question_id": "q05"
+}

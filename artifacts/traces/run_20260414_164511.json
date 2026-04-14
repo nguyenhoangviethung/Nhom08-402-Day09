@@ -1,0 +1,19 @@
+{
+  "run_id": "run_20260414_164511",
+  "task": "Khách hàng có thể yêu cầu hoàn tiền trong bao nhiêu ngày?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "Khách hàng có thể yêu cầu hoàn tiền trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng, với điều kiện sản phẩm bị lỗi do nhà sản xuất, chưa được sử dụng hoặc chưa bị mở seal [1]. \n\nNgoại lệ không được hoàn tiền bao gồm:\n- Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription).\n- Đơn hàng đã áp dụng mã giảm giá đặc biệt theo chương trình khuyến mãi Flash Sale.\n- Sản phẩm đã được kích hoạt hoặc đăng ký tài khoản [2].",
+  "confidence": 0.98,
+  "hitl_triggered": false,
+  "latency_ms": 6960,
+  "timestamp": "2026-04-14T16:45:18.199963"
+}

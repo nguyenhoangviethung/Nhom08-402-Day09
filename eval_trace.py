@@ -30,7 +30,6 @@ from graph import run_graph, save_trace
 # 1. Run Pipeline on Test Questions
 # ─────────────────────────────────────────────
 
-
 def run_test_questions(questions_file: str = "data/test_questions.json") -> list:
     """
     Chạy pipeline với danh sách câu hỏi, lưu trace từng câu.
@@ -55,52 +54,56 @@ def run_test_questions(questions_file: str = "data/test_questions.json") -> list
             result = run_graph(question_text)
             result["question_id"] = q_id
 
-            # Save individual trace
+            # Áp dụng format bắt buộc từ README.md
+            trace_data = {
+                "run_id": result.get("run_id", f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"),
+                "task": question_text,
+                "supervisor_route": result.get("supervisor_route", "unknown"),
+                "route_reason": result.get("route_reason", ""),
+                "workers_called": result.get("workers_called", []),
+                "mcp_tools_used": [t.get("tool") for t in result.get("mcp_tools_used", [])] if result.get("mcp_tools_used") else [],
+                "retrieved_sources": result.get("retrieved_sources", []),
+                "final_answer": result.get("final_answer", ""),
+                "confidence": result.get("confidence", 0.0),
+                "hitl_triggered": result.get("hitl_triggered", False),
+                "latency_ms": result.get("latency_ms", 0),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Lưu trace
             os.makedirs("artifacts/traces", exist_ok=True)
-            trace_file = os.path.join("artifacts/traces", f"{q_id}.json")
+            trace_file = f"artifacts/traces/{trace_data['run_id']}.json"
             with open(trace_file, "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
+                json.dump(trace_data, f, ensure_ascii=False, indent=2)
 
-            print(f"  ✓ Saved: {trace_file}")
-            print(
-                f"  ✓ route={result.get('supervisor_route', '?')}, "
-                f"conf={result.get('confidence', 0):.2f}, "
-                f"{result.get('latency_ms', 0)}ms"
-            )
+            print(f"  ✓ route={trace_data['supervisor_route']}, "
+                  f"conf={trace_data['confidence']:.2f}, "
+                  f"{trace_data['latency_ms']}ms")
 
-            results.append(
-                {
-                    "id": q_id,
-                    "question": question_text,
-                    "expected_answer": q.get("expected_answer", ""),
-                    "expected_sources": q.get("expected_sources", []),
-                    "difficulty": q.get("difficulty", "unknown"),
-                    "category": q.get("category", "unknown"),
-                    "result": result,
-                }
-            )
+            results.append({
+                "id": q_id,
+                "question": question_text,
+                "expected_answer": q.get("expected_answer", ""),
+                "expected_sources": q.get("expected_sources", []),
+                "result": trace_data,
+            })
 
         except Exception as e:
             print(f"  ✗ ERROR: {e}")
-            results.append(
-                {
-                    "id": q_id,
-                    "question": question_text,
-                    "error": str(e),
-                    "result": None,
-                }
-            )
+            results.append({
+                "id": q_id,
+                "question": question_text,
+                "error": str(e),
+                "result": None,
+            })
 
-    print(
-        f"\n✅ Done. {sum(1 for r in results if r.get('result'))} / {len(results)} succeeded."
-    )
+    print(f"\n✅ Done. {sum(1 for r in results if r.get('result'))} / {len(results)} succeeded.")
     return results
 
 
 # ─────────────────────────────────────────────
 # 2. Run Grading Questions (Sprint 4)
 # ─────────────────────────────────────────────
-
 
 def run_grading_questions(questions_file: str = "data/grading_questions.json") -> str:
     """
@@ -140,17 +143,13 @@ def run_grading_questions(questions_file: str = "data/grading_questions.json") -
                     "supervisor_route": result.get("supervisor_route", ""),
                     "route_reason": result.get("route_reason", ""),
                     "workers_called": result.get("workers_called", []),
-                    "mcp_tools_used": [
-                        t.get("tool") for t in result.get("mcp_tools_used", [])
-                    ],
+                    "mcp_tools_used": [t.get("tool") for t in result.get("mcp_tools_used", [])],
                     "confidence": result.get("confidence", 0.0),
                     "hitl_triggered": result.get("hitl_triggered", False),
                     "latency_ms": result.get("latency_ms"),
                     "timestamp": datetime.now().isoformat(),
                 }
-                print(
-                    f"  ✓ route={record['supervisor_route']}, conf={record['confidence']:.2f}"
-                )
+                print(f"  ✓ route={record['supervisor_route']}, conf={record['confidence']:.2f}")
             except Exception as e:
                 record = {
                     "id": q_id,
@@ -178,7 +177,6 @@ def run_grading_questions(questions_file: str = "data/grading_questions.json") -
 # 3. Analyze Traces
 # ─────────────────────────────────────────────
 
-
 def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
     """
     Đọc tất cả trace files và tính metrics tổng hợp.
@@ -205,7 +203,7 @@ def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
 
     traces = []
     for fname in trace_files:
-        with open(os.path.join(traces_dir, fname), encoding="utf-8") as f:
+        with open(os.path.join(traces_dir, fname)) as f:
             traces.append(json.load(f))
 
     # Compute metrics
@@ -240,19 +238,11 @@ def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
     total = len(traces)
     metrics = {
         "total_traces": total,
-        "routing_distribution": {
-            k: f"{v}/{total} ({100 * v // total}%)" for k, v in routing_counts.items()
-        },
-        "avg_confidence": round(sum(confidences) / len(confidences), 3)
-        if confidences
-        else 0,
+        "routing_distribution": {k: f"{v}/{total} ({100*v//total}%)" for k, v in routing_counts.items()},
+        "avg_confidence": round(sum(confidences) / len(confidences), 3) if confidences else 0,
         "avg_latency_ms": round(sum(latencies) / len(latencies)) if latencies else 0,
-        "mcp_usage_rate": f"{mcp_calls}/{total} ({100 * mcp_calls // total}%)"
-        if total
-        else "0%",
-        "hitl_rate": f"{hitl_triggers}/{total} ({100 * hitl_triggers // total}%)"
-        if total
-        else "0%",
+        "mcp_usage_rate": f"{mcp_calls}/{total} ({100*mcp_calls//total}%)" if total else "0%",
+        "hitl_rate": f"{hitl_triggers}/{total} ({100*hitl_triggers//total}%)" if total else "0%",
         "top_sources": sorted(source_counts.items(), key=lambda x: -x[1])[:5],
     }
 
@@ -262,7 +252,6 @@ def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
 # ─────────────────────────────────────────────
 # 4. Compare Single vs Multi Agent
 # ─────────────────────────────────────────────
-
 
 def compare_single_vs_multi(
     multi_traces_dir: str = "artifacts/traces",
@@ -282,14 +271,14 @@ def compare_single_vs_multi(
     # Nếu không có, dùng baseline giả lập để format
     day08_baseline = {
         "total_questions": 15,
-        "avg_confidence": 0.86,  # avg faithfulness 4.30/5 từ scorecard_basline.md
-        "avg_latency_ms": 0,  # không được log trong pipeline
-        "abstain_rate": "1/10 (10%)",  # q09 abstain "Tôi không biết" — Insufficient Context
-        "multi_hop_accuracy": "0/2 (0%)",  # q06, q07 đều Completeness = 2/5 — trả lời lệch trọng tâm
+        "avg_confidence": 0.0,          # TODO: Điền từ Day 08 eval.py
+        "avg_latency_ms": 0,            # TODO: Điền từ Day 08
+        "abstain_rate": "?",            # TODO: Điền từ Day 08
+        "multi_hop_accuracy": "?",      # TODO: Điền từ Day 08
     }
 
     if day08_results_file and os.path.exists(day08_results_file):
-        with open(day08_results_file, encoding="utf-8") as f:
+        with open(day08_results_file) as f:
             day08_baseline = json.load(f)
 
     comparison = {
@@ -312,7 +301,6 @@ def compare_single_vs_multi(
 # 5. Save Eval Report
 # ─────────────────────────────────────────────
 
-
 def save_eval_report(comparison: dict) -> str:
     """Lưu báo cáo eval tổng kết ra file JSON."""
     os.makedirs("artifacts", exist_ok=True)
@@ -325,7 +313,6 @@ def save_eval_report(comparison: dict) -> str:
 # ─────────────────────────────────────────────
 # 6. CLI Entry Point
 # ─────────────────────────────────────────────
-
 
 def print_metrics(metrics: dict):
     """Print metrics đẹp."""
@@ -348,15 +335,9 @@ def print_metrics(metrics: dict):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Day 09 Lab — Trace Evaluation")
     parser.add_argument("--grading", action="store_true", help="Run grading questions")
-    parser.add_argument(
-        "--analyze", action="store_true", help="Analyze existing traces"
-    )
-    parser.add_argument(
-        "--compare", action="store_true", help="Compare single vs multi"
-    )
-    parser.add_argument(
-        "--test-file", default="data/test_questions.json", help="Test questions file"
-    )
+    parser.add_argument("--analyze", action="store_true", help="Analyze existing traces")
+    parser.add_argument("--compare", action="store_true", help="Compare single vs multi")
+    parser.add_argument("--test-file", default="data/test_questions.json", help="Test questions file")
     args = parser.parse_args()
 
     if args.grading:
