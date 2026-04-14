@@ -6,7 +6,7 @@
 |-----|---------|-------|
 | Hoàng | Supervisor Owner | hoangmai04222@gmail.com |
 | Hưng | Tech Lead | hoangduchung0311@gmail.com |
-| Hồng Anh | Tech Lead | anh.anhle2004@gmail.com |
+| Hồng Anh | MCP Owner | anh.anhle2004@gmail.com |
 | Hùng | Tech Lead, Trace Owner | nguyenhoangviethung@gmail.com |
 | Giang | Worker Owner | nguyenhuonggiang06092004@gmail.com |
 | Bình | Trace & Docs Owner | binhntph50046@gmail.com |
