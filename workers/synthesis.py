@@ -1,7 +1,7 @@
 import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
-
+import json
 load_dotenv()
 
 WORKER_NAME = "synthesis_worker"
@@ -51,22 +51,66 @@ def _build_context(chunks: list, policy_result: dict) -> str:
             parts.append(f"[{i}] Nguồn: {source}\n{text}")
 
     return "\n\n".join(parts) if parts else "(Không có context)"
-
-def _estimate_confidence(chunks: list, answer: str, policy_result: dict) -> float:
+def _estimate_confidence(task: str, chunks: list, answer: str, policy_result: dict) -> float:
     """
-    Ước tính độ tin cậy dựa trên điểm số Retrieval và Policy
+    Sử dụng LLM-as-a-Judge để tự động chấm điểm độ tin cậy (Confidence Score).
     """
+    # 1. Bắt các trường hợp rỗng hoặc từ chối trả lời
     if not chunks or "không đủ thông tin" in answer.lower():
         return 0.1
 
-    # Tính trung bình score từ các chunk
-    avg_retrieval_score = sum(c.get("score", 0) for c in chunks) / len(chunks)
-    
-    # Nếu có exception từ policy_tool, giảm nhẹ confidence vì đây là trường hợp đặc biệt
-    penalty = 0.05 * len(policy_result.get("exceptions_found", []))
-    
-    confidence = avg_retrieval_score - penalty
-    return round(max(0.1, min(0.95, confidence)), 2)
+    # 2. Chuẩn bị dữ liệu cho Giám khảo LLM
+    context_text = "\n".join([c.get("text", "") for c in chunks])
+    if policy_result and policy_result.get("exceptions_found"):
+        context_text += "\n[NGOẠI LỆ CHÍNH SÁCH]: " + str(policy_result.get("exceptions_found"))
+
+    judge_prompt = f"""Bạn là một giám khảo độc lập (LLM-as-a-Judge).
+    Nhiệm vụ: Đánh giá độ tin cậy (confidence score) của Câu trả lời so với Ngữ cảnh được cung cấp.
+
+    Câu hỏi từ người dùng: {task}
+    Ngữ cảnh có sẵn: {context_text}
+    Câu trả lời cần chấm: {answer}
+
+    Tiêu chí chấm điểm (0.0 đến 1.0):
+    - 0.9 - 1.0: Câu trả lời chính xác, giải quyết trọn vẹn câu hỏi, được trích xuất hoàn toàn từ ngữ cảnh.
+    - 0.7 - 0.89: Trả lời đúng phần lớn nhưng ngữ cảnh hỗ trợ hơi yếu hoặc thiếu một chút chi tiết.
+    - 0.4 - 0.69: Trả lời chung chung, hoặc ngữ cảnh không thực sự sát với câu hỏi.
+    - 0.1 - 0.39: Lạc đề, bịa đặt (hallucination), hoặc câu trả lời nói rằng không đủ thông tin.
+
+    Trả về ĐÚNG định dạng JSON:
+    {{
+        "confidence": <float>,
+        "reasoning": "<giải thích ngắn gọn 1 câu tại sao cho điểm này>"
+    }}
+    """
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        response = client.chat.completions.create(
+            model=os.getenv("LLM_MODEL", "gpt-4o-mini"),
+            messages=[{"role": "user", "content": judge_prompt}],
+            temperature=0.0, # Nhiệt độ 0 để AI chấm điểm khách quan và ổn định nhất
+            response_format={"type": "json_object"}
+        )
+        
+        result = json.loads(response.choices[0].message.content)
+        conf = float(result.get("confidence", 0.5))
+        reasoning = result.get("reasoning", "")
+        
+        # In log ra màn hình để bạn dễ theo dõi AI đang "nghĩ" gì
+        print(f"  [LLM Judge] Chấm: {conf} | Lý do: {reasoning}")
+
+        # Vẫn phạt nhẹ nếu dính ngoại lệ chính sách (do tính chất phức tạp)
+        penalty = 0.05 * len(policy_result.get("exceptions_found", []))
+        final_conf = max(0.1, min(0.98, conf - penalty))
+        
+        return round(final_conf, 2)
+        
+    except Exception as e:
+        print(f"  [LLM Judge] Lỗi khi chấm điểm: {e}. Fallback về mức 0.5")
+        return 0.5
+
 
 def synthesize(task: str, chunks: list, policy_result: dict) -> dict:
     """
@@ -81,7 +125,9 @@ def synthesize(task: str, chunks: list, policy_result: dict) -> dict:
 
     answer = _call_llm(messages)
     sources = list({c.get("source", "unknown") for c in chunks})
-    confidence = _estimate_confidence(chunks, answer, policy_result)
+    
+    # TRUYỀN THÊM `task` (câu hỏi) VÀO HÀM CHẤM ĐIỂM
+    confidence = _estimate_confidence(task, chunks, answer, policy_result)
 
     return {
         "answer": answer,

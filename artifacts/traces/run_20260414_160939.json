@@ -1,0 +1,187 @@
+{
+  "task": "SLA xử lý ticket P1 là bao lâu?",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "risk_high": false,
+  "needs_tool": true,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.4842,
+      "metadata": {
+        "effective_date": "2026-01-15",
+        "section": "Phần 2: SLA theo mức độ ưu tiên",
+        "access": "internal",
+        "department": "IT",
+        "source": "support/sla-p1-2026.pdf"
+      }
+    },
+    {
+      "text": "v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.3778,
+      "metadata": {
+        "access": "internal",
+        "department": "IT",
+        "source": "support/sla-p1-2026.pdf",
+        "section": "Phần 5: Lịch sử phiên bản",
+        "effective_date": "2026-01-15"
+      }
+    },
+    {
+      "text": "Bước 1: Khách hàng gửi yêu cầu qua hệ thống ticket nội bộ với category \"Refund Request\".\nBước 2: CS Agent xem xét trong vòng 1 ngày làm việc và xác nhận điều kiện đủ điều kiện.\nBước 3: Nếu đủ điều kiện, chuyển yêu cầu sang Finance Team để xử lý hoàn tiền.\nBước 4: Finance Team xử lý trong 3-5 ngày làm việc và thông báo kết quả cho khách hàng.",
+      "source": "policy/refund-v4.pdf",
+      "score": 0.3394,
+      "metadata": {
+        "effective_date": "2026-02-01",
+        "department": "CS",
+        "section": "Điều 4: Quy trình xử lý yêu cầu hoàn tiền",
+        "source": "policy/refund-v4.pdf",
+        "access": "internal"
+      }
+    }
+  ],
+  "retrieved_sources": [],
+  "policy_result": {
+    "policy_applies": true,
+    "policy_name": "SLA P1",
+    "exceptions_found": [],
+    "explanation": "Yêu cầu về SLA xử lý ticket P1 được xác định rõ ràng trong chính sách và không có vi phạm nào được phát hiện.",
+    "source": [
+      "support/sla-p1-2026.pdf",
+      "policy/refund-v4.pdf"
+    ]
+  },
+  "mcp_tools_used": [
+    {
+      "tool": "search_kb",
+      "input": {
+        "query": "SLA xử lý ticket P1 là bao lâu?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks": [
+          {
+            "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+            "source": "support/sla-p1-2026.pdf",
+            "score": 0.4842,
+            "metadata": {
+              "effective_date": "2026-01-15",
+              "section": "Phần 2: SLA theo mức độ ưu tiên",
+              "access": "internal",
+              "department": "IT",
+              "source": "support/sla-p1-2026.pdf"
+            }
+          },
+          {
+            "text": "v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+            "source": "support/sla-p1-2026.pdf",
+            "score": 0.3778,
+            "metadata": {
+              "access": "internal",
+              "department": "IT",
+              "source": "support/sla-p1-2026.pdf",
+              "section": "Phần 5: Lịch sử phiên bản",
+              "effective_date": "2026-01-15"
+            }
+          },
+          {
+            "text": "Bước 1: Khách hàng gửi yêu cầu qua hệ thống ticket nội bộ với category \"Refund Request\".\nBước 2: CS Agent xem xét trong vòng 1 ngày làm việc và xác nhận điều kiện đủ điều kiện.\nBước 3: Nếu đủ điều kiện, chuyển yêu cầu sang Finance Team để xử lý hoàn tiền.\nBước 4: Finance Team xử lý trong 3-5 ngày làm việc và thông báo kết quả cho khách hàng.",
+            "source": "policy/refund-v4.pdf",
+            "score": 0.3394,
+            "metadata": {
+              "effective_date": "2026-02-01",
+              "department": "CS",
+              "section": "Điều 4: Quy trình xử lý yêu cầu hoàn tiền",
+              "source": "policy/refund-v4.pdf",
+              "access": "internal"
+            }
+          }
+        ],
+        "sources": [
+          "policy/refund-v4.pdf",
+          "support/sla-p1-2026.pdf"
+        ],
+        "total_found": 3
+      },
+      "error": null,
+      "timestamp": "2026-04-14T16:09:39.213676"
+    },
+    {
+      "tool": "get_ticket_info",
+      "input": {
+        "ticket_id": "P1-LATEST"
+      },
+      "output": {
+        "ticket_id": "IT-9847",
+        "priority": "P1",
+        "title": "API Gateway down — toàn bộ người dùng không đăng nhập được",
+        "status": "in_progress",
+        "assignee": "nguyen.van.a@company.internal",
+        "created_at": "2026-04-13T22:47:00",
+        "sla_deadline": "2026-04-14T02:47:00",
+        "escalated": true,
+        "notifications_sent": [
+          "slack:#incident-p1",
+          "pagerduty:oncall"
+        ]
+      },
+      "error": null,
+      "timestamp": "2026-04-14T16:09:41.428049"
+    }
+  ],
+  "final_answer": "SLA xử lý ticket P1 là như sau:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve. [1]",
+  "sources": [
+    "support/sla-p1-2026.pdf",
+    "policy/refund-v4.pdf"
+  ],
+  "confidence": 0.48,
+  "history": [
+    "[supervisor] received task: SLA xử lý ticket P1 là bao lâu?",
+    "[supervisor] route=policy_tool_worker reason=task chứa keyword liên quan policy/quyền truy cập/ticket",
+    "[policy_tool_worker] called MCP search_kb",
+    "[policy_tool_worker] called MCP get_ticket_info",
+    "[policy_tool_worker] policy_applies=True, exceptions=0",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.48",
+    "[graph] completed in 4922ms"
+  ],
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "policy_tool_worker",
+  "latency_ms": 4922,
+  "run_id": "run_20260414_160939",
+  "worker_io_logs": [
+    {
+      "worker": "policy_tool_worker",
+      "input": {
+        "task": "SLA xử lý ticket P1 là bao lâu?",
+        "chunks_count": 0,
+        "needs_tool": true
+      },
+      "output": {
+        "policy_applies": true,
+        "exceptions_count": 0,
+        "mcp_calls": 2
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "SLA xử lý ticket P1 là bao lâu?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "SLA xử lý ticket P1 là như sau:\n- Phản hồi ban đầu...",
+        "sources": [
+          "support/sla-p1-2026.pdf",
+          "policy/refund-v4.pdf"
+        ],
+        "confidence": 0.48
+      }
+    }
+  ]
+}

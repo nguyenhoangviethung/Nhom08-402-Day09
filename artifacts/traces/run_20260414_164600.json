@@ -1,0 +1,21 @@
+{
+  "run_id": "run_20260414_164600",
+  "task": "ERR-403-AUTH là lỗi gì và cách xử lý?",
+  "supervisor_route": "retrieval_worker",
+  "route_reason": "mã lỗi lạ + risk_high -> dừng lại cần human review | human approved → retrieval",
+  "workers_called": [
+    "human_review",
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [],
+  "retrieved_sources": [
+    "support/sla-p1-2026.pdf",
+    "it/access-control-sop.md"
+  ],
+  "final_answer": "Không đủ thông tin trong tài liệu nội bộ về lỗi ERR-403-AUTH và cách xử lý cụ thể của nó. [1] [2] [3]",
+  "confidence": 0.1,
+  "hitl_triggered": true,
+  "latency_ms": 1678,
+  "timestamp": "2026-04-14T16:46:02.659563"
+}

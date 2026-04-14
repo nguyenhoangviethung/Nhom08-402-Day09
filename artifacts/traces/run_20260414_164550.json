@@ -1,0 +1,19 @@
+{
+  "run_id": "run_20260414_164550",
+  "task": "Sản phẩm kỹ thuật số (license key) có được hoàn tiền không?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "Ngoại lệ không được hoàn tiền: Sản phẩm thuộc danh mục hàng kỹ thuật số (license key, subscription) không được hoàn tiền. \n\nDo đó, sản phẩm kỹ thuật số (license key) không được hoàn tiền theo chính sách hiện hành. [1]",
+  "confidence": 0.81,
+  "hitl_triggered": false,
+  "latency_ms": 4817,
+  "timestamp": "2026-04-14T16:45:54.945878"
+}
