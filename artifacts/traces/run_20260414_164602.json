@@ -1,0 +1,19 @@
+{
+  "run_id": "run_20260414_164602",
+  "task": "Store credit khi hoàn tiền có giá trị bao nhiêu so với tiền gốc?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "Khi hoàn tiền qua credit nội bộ (store credit), giá trị của store credit sẽ là 110% so với số tiền gốc. Điều này có nghĩa là khách hàng sẽ nhận được nhiều hơn 10% so với số tiền họ đã chi ban đầu nếu họ chọn phương thức hoàn tiền này. [1]",
+  "confidence": 0.97,
+  "hitl_triggered": false,
+  "latency_ms": 4558,
+  "timestamp": "2026-04-14T16:46:07.221067"
+}

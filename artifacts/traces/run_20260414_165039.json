@@ -1,0 +1,21 @@
+{
+  "run_id": "run_20260414_165039",
+  "task": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
+  "supervisor_route": "retrieval_worker",
+  "route_reason": "default route",
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [],
+  "retrieved_sources": [
+    "support/sla-p1-2026.pdf",
+    "it/access-control-sop.md",
+    "support/helpdesk-faq.md"
+  ],
+  "final_answer": "Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, bạn có thể liên hệ IT Helpdesk hoặc tự reset qua portal SSO. [1]",
+  "confidence": 0.9,
+  "hitl_triggered": false,
+  "latency_ms": 19988,
+  "timestamp": "2026-04-14T16:50:59.507664"
+}

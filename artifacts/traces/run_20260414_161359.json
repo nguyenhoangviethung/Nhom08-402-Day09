@@ -1,0 +1,108 @@
+{
+  "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+  "route_reason": "default route",
+  "risk_high": false,
+  "needs_tool": false,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "4.1 Điều kiện remote:\n- Nhân viên sau probation period có thể làm remote tối đa 2 ngày/tuần.\n- Team Lead phải phê duyệt lịch remote qua HR Portal.\n- Ngày onsite bắt buộc: Thứ 3 và Thứ 5 theo lịch team.\n\n4.2 Yêu cầu kỹ thuật khi remote:\n- Kết nối VPN bắt buộc khi làm việc với hệ thống nội bộ.\n- Camera bật trong các cuộc họp team.",
+      "source": "hr/leave-policy-2026.pdf",
+      "score": 0.4921,
+      "metadata": {
+        "department": "HR",
+        "source": "hr/leave-policy-2026.pdf",
+        "effective_date": "2026-01-01",
+        "section": "Phần 4: Remote work policy",
+        "access": "internal"
+      }
+    },
+    {
+      "text": "Level 1 — Read Only:\nÁp dụng cho: Tất cả nhân viên mới trong 30 ngày đầu.\nPhê duyệt: Line Manager.\nThời gian xử lý: 1 ngày làm việc.\n\nLevel 2 — Standard Access:\nÁp dụng cho: Nhân viên chính thức đã qua thử việc.\nPhê duyệt: Line Manager + IT Admin.\nThời gian xử lý: 2 ngày làm việc.\n\nLevel 3 — Elevated Access:\nÁp dụng cho: Team Lead, Senior Engineer, Manager.\nPhê duyệt: Line Manager + IT Admin + IT Security.\nThời gian xử lý: 3 ngày làm việc.\n\nLevel 4 — Admin Access:\nÁp dụng cho: DevOps, SRE, IT Admin.\nPhê duyệt: IT Manager + CISO.\nThời gian xử lý: 5 ngày làm việc.\nYêu cầu thêm: Training bắt buộc về security policy.",
+      "source": "it/access-control-sop.md",
+      "score": 0.2596,
+      "metadata": {
+        "access": "internal",
+        "effective_date": "2026-01-01",
+        "section": "Section 2: Phân cấp quyền truy cập",
+        "department": "IT Security",
+        "source": "it/access-control-sop.md"
+      }
+    },
+    {
+      "text": "Q: Tôi cần cài phần mềm mới, phải làm gì?\nA: Gửi yêu cầu qua Jira project IT-SOFTWARE. Line Manager phải phê duyệt trước khi IT cài đặt.\n\nQ: Ai chịu trách nhiệm gia hạn license phần mềm?\nA: IT Procurement team quản lý tất cả license. Nhắc nhở sẽ được gửi 30 ngày trước khi hết hạn.",
+      "source": "support/helpdesk-faq.md",
+      "score": 0.2458,
+      "metadata": {
+        "source": "support/helpdesk-faq.md",
+        "effective_date": "2026-01-20",
+        "department": "IT",
+        "section": "Section 3: Phần mềm và license",
+        "access": "internal"
+      }
+    }
+  ],
+  "retrieved_sources": [
+    "support/helpdesk-faq.md",
+    "hr/leave-policy-2026.pdf",
+    "it/access-control-sop.md"
+  ],
+  "policy_result": {},
+  "mcp_tools_used": [],
+  "final_answer": "Ngoại lệ (Policy Exceptions): Nhân viên trong thời gian thử việc không đủ điều kiện để làm remote.\n\nTheo tài liệu, chỉ có nhân viên đã qua probation period mới có thể làm remote tối đa 2 ngày/tuần. Để được làm remote, nhân viên cần có sự phê duyệt lịch remote từ Team Lead qua HR Portal. Ngoài ra, ngày onsite bắt buộc là Thứ 3 và Thứ 5 theo lịch team. [1]",
+  "sources": [
+    "support/helpdesk-faq.md",
+    "hr/leave-policy-2026.pdf",
+    "it/access-control-sop.md"
+  ],
+  "confidence": 0.49,
+  "history": [
+    "[supervisor] received task: Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá ",
+    "[supervisor] route=retrieval_worker reason=default route",
+    "[retrieval_worker] called",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.49",
+    "[graph] completed in 2858ms"
+  ],
+  "workers_called": [
+    "retrieval_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "retrieval_worker",
+  "latency_ms": 2858,
+  "run_id": "run_20260414_161359",
+  "worker_io_logs": [
+    {
+      "worker": "retrieval_worker",
+      "input": {
+        "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+        "top_k": 3,
+        "mode": "dense"
+      },
+      "output": {
+        "retrieved_chunks_count": 3,
+        "retrieved_sources": [
+          "support/helpdesk-faq.md",
+          "hr/leave-policy-2026.pdf",
+          "it/access-control-sop.md"
+        ]
+      }
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "Ngoại lệ (Policy Exceptions): Nhân viên trong thời...",
+        "sources": [
+          "support/helpdesk-faq.md",
+          "hr/leave-policy-2026.pdf",
+          "it/access-control-sop.md"
+        ],
+        "confidence": 0.49
+      }
+    }
+  ],
+  "question_id": "q14"
+}

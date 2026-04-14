@@ -1,0 +1,20 @@
+{
+  "run_id": "run_20260414_164554",
+  "task": "Quy trình xử lý sự cố P1 gồm mấy bước và bước đầu tiên là gì?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb",
+    "get_ticket_info"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "Quy trình xử lý sự cố P1 gồm 5 bước. Bước đầu tiên là \"Tiếp nhận\", trong đó on-call engineer nhận alert hoặc ticket và xác nhận severity trong 5 phút. [1]",
+  "confidence": 0.78,
+  "hitl_triggered": false,
+  "latency_ms": 6033,
+  "timestamp": "2026-04-14T16:46:00.979985"
+}

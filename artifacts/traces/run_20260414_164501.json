@@ -1,0 +1,20 @@
+{
+  "run_id": "run_20260414_164501",
+  "task": "SLA xử lý ticket P1 là bao lâu?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb",
+    "get_ticket_info"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "SLA xử lý ticket P1 bao gồm các thời gian như sau:\n\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nNguồn: [1].",
+  "confidence": 0.94,
+  "hitl_triggered": false,
+  "latency_ms": 9941,
+  "timestamp": "2026-04-14T16:45:11.236868"
+}

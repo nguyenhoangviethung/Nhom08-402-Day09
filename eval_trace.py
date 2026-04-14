@@ -54,20 +54,38 @@ def run_test_questions(questions_file: str = "data/test_questions.json") -> list
             result = run_graph(question_text)
             result["question_id"] = q_id
 
-            # Save individual trace
-            trace_file = save_trace(result, f"artifacts/traces")
-            print(f"  ✓ route={result.get('supervisor_route', '?')}, "
-                  f"conf={result.get('confidence', 0):.2f}, "
-                  f"{result.get('latency_ms', 0)}ms")
+            # Áp dụng format bắt buộc từ README.md
+            trace_data = {
+                "run_id": result.get("run_id", f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"),
+                "task": question_text,
+                "supervisor_route": result.get("supervisor_route", "unknown"),
+                "route_reason": result.get("route_reason", ""),
+                "workers_called": result.get("workers_called", []),
+                "mcp_tools_used": [t.get("tool") for t in result.get("mcp_tools_used", [])] if result.get("mcp_tools_used") else [],
+                "retrieved_sources": result.get("retrieved_sources", []),
+                "final_answer": result.get("final_answer", ""),
+                "confidence": result.get("confidence", 0.0),
+                "hitl_triggered": result.get("hitl_triggered", False),
+                "latency_ms": result.get("latency_ms", 0),
+                "timestamp": datetime.now().isoformat()
+            }
+            
+            # Lưu trace
+            os.makedirs("artifacts/traces", exist_ok=True)
+            trace_file = f"artifacts/traces/{trace_data['run_id']}.json"
+            with open(trace_file, "w", encoding="utf-8") as f:
+                json.dump(trace_data, f, ensure_ascii=False, indent=2)
+
+            print(f"  ✓ route={trace_data['supervisor_route']}, "
+                  f"conf={trace_data['confidence']:.2f}, "
+                  f"{trace_data['latency_ms']}ms")
 
             results.append({
                 "id": q_id,
                 "question": question_text,
                 "expected_answer": q.get("expected_answer", ""),
                 "expected_sources": q.get("expected_sources", []),
-                "difficulty": q.get("difficulty", "unknown"),
-                "category": q.get("category", "unknown"),
-                "result": result,
+                "result": trace_data,
             })
 
         except Exception as e:

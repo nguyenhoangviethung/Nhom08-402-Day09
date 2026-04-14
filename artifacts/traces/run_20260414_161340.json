@@ -1,0 +1,188 @@
+{
+  "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "risk_high": false,
+  "needs_tool": true,
+  "hitl_triggered": false,
+  "retrieved_chunks": [
+    {
+      "text": "v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.3635,
+      "metadata": {
+        "effective_date": "2026-01-15",
+        "section": "Phần 5: Lịch sử phiên bản",
+        "source": "support/sla-p1-2026.pdf",
+        "department": "IT",
+        "access": "internal"
+      }
+    },
+    {
+      "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+      "source": "support/sla-p1-2026.pdf",
+      "score": 0.2385,
+      "metadata": {
+        "source": "support/sla-p1-2026.pdf",
+        "access": "internal",
+        "department": "IT",
+        "effective_date": "2026-01-15",
+        "section": "Phần 2: SLA theo mức độ ưu tiên"
+      }
+    },
+    {
+      "text": "Q: Laptop mới được cấp sau bao lâu khi vào công ty?\nA: Laptop được cấp trong ngày onboarding đầu tiên. Nếu có vấn đề, liên hệ HR hoặc IT Admin.\n\nQ: Laptop bị hỏng phải báo cáo như thế nào?\nA: Tạo ticket P2 hoặc P3 tùy mức độ nghiêm trọng. Mang thiết bị đến IT Room (tầng 3) để kiểm tra.",
+      "source": "support/helpdesk-faq.md",
+      "metadata": {
+        "department": "IT",
+        "source": "support/helpdesk-faq.md",
+        "section": "Section 4: Thiết bị và phần cứng",
+        "effective_date": "2026-01-20",
+        "access": "internal"
+      },
+      "score": 8.839142987226893
+    }
+  ],
+  "retrieved_sources": [],
+  "policy_result": {
+    "policy_applies": true,
+    "policy_name": "SLA P1 resolution",
+    "exceptions_found": [],
+    "explanation": "Chính sách SLA P1 resolution áp dụng cho ticket P1, với thời gian phản hồi ban đầu là 15 phút và thời gian xử lý là 4 giờ. Escalation sẽ xảy ra tự động lên Senior Engineer nếu không có phản hồi trong 10 phút. Do đó, không có vi phạm nào về chính sách hay ngoại lệ.",
+    "source": [
+      "support/sla-p1-2026.pdf",
+      "support/helpdesk-faq.md"
+    ]
+  },
+  "mcp_tools_used": [
+    {
+      "tool": "search_kb",
+      "input": {
+        "query": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+        "top_k": 3
+      },
+      "output": {
+        "chunks": [
+          {
+            "text": "v2026.1 (2026-01-15): Cập nhật SLA P1 resolution từ 6 giờ xuống 4 giờ.\nv2025.3 (2025-09-01): Thêm quy trình escalation tự động.\nv2025.1 (2025-03-01): Phiên bản đầu tiên.",
+            "source": "support/sla-p1-2026.pdf",
+            "score": 0.3635,
+            "metadata": {
+              "effective_date": "2026-01-15",
+              "section": "Phần 5: Lịch sử phiên bản",
+              "source": "support/sla-p1-2026.pdf",
+              "department": "IT",
+              "access": "internal"
+            }
+          },
+          {
+            "text": "Ticket P1:\n- Phản hồi ban đầu (first response): 15 phút kể từ khi ticket được tạo.\n- Xử lý và khắc phục (resolution): 4 giờ.\n- Escalation: Tự động escalate lên Senior Engineer nếu không có phản hồi trong 10 phút.\n- Thông báo stakeholder: Ngay khi nhận ticket, update mỗi 30 phút cho đến khi resolve.\n\nTicket P2:\n- Phản hồi ban đầu: 2 giờ.\n- Xử lý và khắc phục: 1 ngày làm việc.\n- Escalation: Tự động escalate sau 90 phút không có phản hồi.\n\nTicket P3:\n- Phản hồi ban đầu: 1 ngày làm việc.\n- Xử lý và khắc phục: 5 ngày làm việc.\n\nTicket P4:\n- Phản hồi ban đầu: 3 ngày làm việc.\n- Xử lý và khắc phục: Theo sprint cycle (thông thường 2-4 tuần).",
+            "source": "support/sla-p1-2026.pdf",
+            "score": 0.2385,
+            "metadata": {
+              "source": "support/sla-p1-2026.pdf",
+              "access": "internal",
+              "department": "IT",
+              "effective_date": "2026-01-15",
+              "section": "Phần 2: SLA theo mức độ ưu tiên"
+            }
+          },
+          {
+            "text": "Q: Laptop mới được cấp sau bao lâu khi vào công ty?\nA: Laptop được cấp trong ngày onboarding đầu tiên. Nếu có vấn đề, liên hệ HR hoặc IT Admin.\n\nQ: Laptop bị hỏng phải báo cáo như thế nào?\nA: Tạo ticket P2 hoặc P3 tùy mức độ nghiêm trọng. Mang thiết bị đến IT Room (tầng 3) để kiểm tra.",
+            "source": "support/helpdesk-faq.md",
+            "metadata": {
+              "department": "IT",
+              "source": "support/helpdesk-faq.md",
+              "section": "Section 4: Thiết bị và phần cứng",
+              "effective_date": "2026-01-20",
+              "access": "internal"
+            },
+            "score": 8.839142987226893
+          }
+        ],
+        "sources": [
+          "support/helpdesk-faq.md",
+          "support/sla-p1-2026.pdf"
+        ],
+        "total_found": 3
+      },
+      "error": null,
+      "timestamp": "2026-04-14T16:13:40.113722"
+    },
+    {
+      "tool": "get_ticket_info",
+      "input": {
+        "ticket_id": "P1-LATEST"
+      },
+      "output": {
+        "ticket_id": "IT-9847",
+        "priority": "P1",
+        "title": "API Gateway down — toàn bộ người dùng không đăng nhập được",
+        "status": "in_progress",
+        "assignee": "nguyen.van.a@company.internal",
+        "created_at": "2026-04-13T22:47:00",
+        "sla_deadline": "2026-04-14T02:47:00",
+        "escalated": true,
+        "notifications_sent": [
+          "slack:#incident-p1",
+          "pagerduty:oncall"
+        ]
+      },
+      "error": null,
+      "timestamp": "2026-04-14T16:13:42.473454"
+    }
+  ],
+  "final_answer": "Ngoại lệ: Không có ngoại lệ nào được đề cập trong tài liệu.\n\nTheo thông tin từ tài liệu, khi Ticket P1 được tạo lúc 22:47, thông báo đầu tiên sẽ được gửi đến stakeholder ngay lập tức qua kênh thông báo. Sau đó, sẽ có các cập nhật mỗi 30 phút cho đến khi ticket được giải quyết. \n\nEscalation sẽ xảy ra tự động lên Senior Engineer nếu không có phản hồi trong 10 phút. Do đó, nếu không có phản hồi nào được thực hiện, escalation sẽ xảy ra vào lúc 22:57 (22:47 + 10 phút).\n\nTóm lại:\n- Thông báo đầu tiên: Ngay khi nhận ticket qua kênh thông báo.\n- Thời gian escalation: 22:57. \n\nNguồn: [support/sla-p1-2026.pdf].",
+  "sources": [
+    "support/sla-p1-2026.pdf",
+    "support/helpdesk-faq.md"
+  ],
+  "confidence": 0.98,
+  "history": [
+    "[supervisor] received task: Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Esc",
+    "[supervisor] route=policy_tool_worker reason=task chứa keyword liên quan policy/quyền truy cập/ticket",
+    "[policy_tool_worker] called MCP search_kb",
+    "[policy_tool_worker] called MCP get_ticket_info",
+    "[policy_tool_worker] policy_applies=True, exceptions=0",
+    "[synthesis_worker] Đã tạo câu trả lời. Confidence: 0.98",
+    "[graph] completed in 6426ms"
+  ],
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "supervisor_route": "policy_tool_worker",
+  "latency_ms": 6426,
+  "run_id": "run_20260414_161340",
+  "worker_io_logs": [
+    {
+      "worker": "policy_tool_worker",
+      "input": {
+        "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+        "chunks_count": 0,
+        "needs_tool": true
+      },
+      "output": {
+        "policy_applies": true,
+        "exceptions_count": 0,
+        "mcp_calls": 2
+      },
+      "error": null
+    },
+    {
+      "worker": "synthesis_worker",
+      "input": {
+        "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+        "chunks_count": 3
+      },
+      "output": {
+        "final_answer": "Ngoại lệ: Không có ngoại lệ nào được đề cập trong ...",
+        "sources": [
+          "support/sla-p1-2026.pdf",
+          "support/helpdesk-faq.md"
+        ],
+        "confidence": 0.98
+      }
+    }
+  ],
+  "question_id": "q11"
+}

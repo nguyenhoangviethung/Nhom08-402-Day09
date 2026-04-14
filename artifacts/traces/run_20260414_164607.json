@@ -1,0 +1,20 @@
+{
+  "run_id": "run_20260414_164607",
+  "task": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+  "supervisor_route": "policy_tool_worker",
+  "route_reason": "task chứa keyword liên quan policy/quyền truy cập/ticket",
+  "workers_called": [
+    "policy_tool_worker",
+    "synthesis_worker"
+  ],
+  "mcp_tools_used": [
+    "search_kb",
+    "get_ticket_info"
+  ],
+  "retrieved_sources": [],
+  "final_answer": "Ngoại lệ: Không có ngoại lệ nào được đề cập trong tài liệu.\n\nTheo thông tin trong tài liệu, khi Ticket P1 được tạo lúc 22:47, thông báo đầu tiên sẽ được gửi đến stakeholder ngay lập tức qua kênh thông báo. Nếu không có phản hồi trong 10 phút, ticket sẽ tự động escalate lên Senior Engineer. Do đó, escalation sẽ xảy ra lúc 22:57 nếu không có phản hồi nào được thực hiện.\n\nTóm lại:\n- Ai sẽ nhận thông báo đầu tiên: Stakeholder.\n- Kênh thông báo: Ngay khi nhận ticket.\n- Escalation xảy ra lúc: 22:57. [support/sla-p1-2026.pdf]",
+  "confidence": 0.98,
+  "hitl_triggered": false,
+  "latency_ms": 7548,
+  "timestamp": "2026-04-14T16:46:14.773653"
+}
