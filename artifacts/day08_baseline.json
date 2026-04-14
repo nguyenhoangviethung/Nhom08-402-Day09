@@ -1,77 +1,112 @@
 {
-  "total_questions": 10,
-  "avg_confidence": 0.85,
-  "avg_latency_ms": 3615,
+  "total_questions": 15,
+  "avg_confidence": 0.847,
+  "avg_latency_ms": 2897,
   "details": [
     {
       "id": "q01",
       "question": "SLA xử lý ticket P1 là bao lâu?",
-      "answer": "SLA xử lý ticket P1 là 4 giờ kể từ khi ticket được tạo [1].",
+      "answer": "SLA xử lý ticket P1 là 4 giờ để khắc phục và xử lý sau phản hồi ban đầu trong 15 phút kể từ khi ticket được tạo [1].",
       "confidence": 0.9,
-      "latency_ms": 14606
+      "latency_ms": 13513
     },
     {
       "id": "q02",
       "question": "Khách hàng có thể yêu cầu hoàn tiền trong bao nhiêu ngày?",
       "answer": "Khách hàng có thể yêu cầu hoàn tiền trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng [1].",
       "confidence": 1.0,
-      "latency_ms": 2533
+      "latency_ms": 2490
     },
     {
       "id": "q03",
       "question": "Ai phải phê duyệt để cấp quyền Level 3?",
-      "answer": "Để cấp quyền Level 3, cần có sự phê duyệt của Line Manager, IT Admin và IT Security [1].",
+      "answer": "Để cấp quyền Level 3, yêu cầu phải được phê duyệt bởi Line Manager, IT Admin và IT Security [1].",
       "confidence": 1.0,
-      "latency_ms": 2778
+      "latency_ms": 1518
     },
     {
       "id": "q04",
-      "question": "Sản phẩm kỹ thuật số có được hoàn tiền không?",
-      "answer": "Sản phẩm kỹ thuật số không được hoàn tiền. Cụ thể, các sản phẩm thuộc danh mục hàng kỹ thuật số như license key và subscription nằm trong danh sách ngoại lệ không được hoàn tiền [1].",
-      "confidence": 0.9,
-      "latency_ms": 1944
-    },
-    {
-      "id": "q05",
       "question": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai?",
       "answer": "Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. Để mở khóa, bạn có thể liên hệ IT Helpdesk hoặc tự reset qua portal SSO [1].",
       "confidence": 0.9,
-      "latency_ms": 2420
+      "latency_ms": 3272
     },
     {
-      "id": "q06",
-      "question": "Escalation trong sự cố P1 diễn ra như thế nào?",
-      "answer": "Escalation trong sự cố P1 diễn ra theo quy trình khẩn cấp như sau:\n\n1. On-call IT Admin có thể cấp quyền tạm thời (tối đa 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24 giờ, phải có ticket chính thức hoặc quyền sẽ bị thu hồi tự động.\n3. Tất cả quyền tạm thời phải được ghi log vào hệ thống Security Audit [1].",
-      "confidence": 0.9,
-      "latency_ms": 3481
-    },
-    {
-      "id": "q07",
-      "question": "Approval Matrix để cấp quyền hệ thống là tài liệu nào?",
-      "answer": "Tài liệu liên quan đến Approval Matrix để cấp quyền hệ thống là tài liệu quy định quy trình cấp phép truy cập vào các hệ thống nội bộ của công ty, được nêu trong ngữ cảnh [1].",
-      "confidence": 0.9,
-      "latency_ms": 2048
-    },
-    {
-      "id": "q08",
+      "id": "q05",
       "question": "Nhân viên được làm remote tối đa mấy ngày mỗi tuần?",
       "answer": "Nhân viên được làm remote tối đa 2 ngày mỗi tuần sau khi hoàn thành probation period [1].",
       "confidence": 1.0,
-      "latency_ms": 1191
+      "latency_ms": 1548
+    },
+    {
+      "id": "q06",
+      "question": "Ticket P1 không được phản hồi sau 10 phút. Hệ thống tự động làm gì?",
+      "answer": "Hệ thống sẽ tự động escalate ticket P1 lên Senior Engineer nếu không có phản hồi trong 10 phút [1].",
+      "confidence": 1.0,
+      "latency_ms": 2093
+    },
+    {
+      "id": "q07",
+      "question": "Sản phẩm kỹ thuật số (license key) có được hoàn tiền không?",
+      "answer": "Sản phẩm kỹ thuật số (license key) không được hoàn tiền. Điều này nằm trong ngoại lệ không được hoàn tiền cho các sản phẩm thuộc danh mục hàng kỹ thuật số [1].",
+      "confidence": 0.9,
+      "latency_ms": 1672
+    },
+    {
+      "id": "q08",
+      "question": "Quy trình xử lý sự cố P1 gồm mấy bước và bước đầu tiên là gì?",
+      "answer": "Quy trình xử lý sự cố P1 gồm 4 bước. Bước đầu tiên là phản hồi ban đầu (first response) trong vòng 15 phút kể từ khi ticket được tạo [1].",
+      "confidence": 0.4,
+      "latency_ms": 1624
     },
     {
       "id": "q09",
       "question": "ERR-403-AUTH là lỗi gì và cách xử lý?",
       "answer": "Tôi không biết.",
       "confidence": 0.1,
-      "latency_ms": 2739
+      "latency_ms": 1034
     },
     {
       "id": "q10",
-      "question": "Nếu cần hoàn tiền khẩn cấp cho khách hàng VIP, quy trình có khác không?",
-      "answer": "Từ ngữ cảnh cung cấp, không có thông tin nào đề cập đến quy trình hoàn tiền khẩn cấp cho khách hàng VIP. Do đó, tôi không biết liệu quy trình có khác hay không.",
+      "question": "Store credit khi hoàn tiền có giá trị bao nhiêu so với tiền gốc?",
+      "answer": "Store credit khi hoàn tiền có giá trị 110% so với số tiền gốc [1].",
+      "confidence": 1.0,
+      "latency_ms": 1757
+    },
+    {
+      "id": "q11",
+      "question": "Ticket P1 được tạo lúc 22:47. Ai sẽ nhận thông báo đầu tiên và qua kênh nào? Escalation xảy ra lúc mấy giờ?",
+      "answer": "Người nhận thông báo đầu tiên sẽ là stakeholder qua kênh thông báo ngay khi ticket được tạo. Escalation sẽ xảy ra sau 10 phút nếu không có phản hồi, tức là vào lúc 22:57 [2].",
       "confidence": 0.9,
-      "latency_ms": 2410
+      "latency_ms": 1666
+    },
+    {
+      "id": "q12",
+      "question": "Khách hàng đặt đơn ngày 31/01/2026 và yêu cầu hoàn tiền ngày 07/02/2026. Sản phẩm lỗi nhà sản xuất, chưa kích hoạt, không phải Flash Sale. Được hoàn tiền không?",
+      "answer": "Khách hàng sẽ được hoàn tiền vì sản phẩm lỗi do nhà sản xuất, yêu cầu hoàn tiền được gửi trong vòng 7 ngày kể từ thời điểm xác nhận đơn hàng, và sản phẩm chưa được kích hoạt. Điều này đáp ứng đủ các điều kiện để được hoàn tiền theo chính sách [1][2].",
+      "confidence": 0.9,
+      "latency_ms": 2248
+    },
+    {
+      "id": "q13",
+      "question": "Contractor cần Admin Access (Level 3) để khắc phục sự cố P1 đang active. Quy trình cấp quyền tạm thời như thế nào?",
+      "answer": "Quy trình cấp quyền tạm thời cho Contractor cần Admin Access (Level 3) trong trường hợp khẩn cấp như sự cố P1 đang active như sau:\n\n1. On-call IT Admin có thể cấp quyền tạm thời (tối đa 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24 giờ, phải có ticket chính thức hoặc quyền sẽ bị thu hồi tự động.\n3. Mọi quyền tạm thời phải được ghi log vào hệ thống Security Audit [1].",
+      "confidence": 0.9,
+      "latency_ms": 3054
+    },
+    {
+      "id": "q14",
+      "question": "Nhân viên vừa vào thử việc (trong probation period) muốn làm remote vì lý do cá nhân. Điều kiện là gì?",
+      "answer": "Nhân viên vừa vào thử việc không đủ điều kiện để làm remote. Theo chính sách, chỉ những nhân viên đã qua probation period mới có thể làm remote tối đa 2 ngày/tuần và cần có sự phê duyệt của Team Lead qua HR Portal [1].",
+      "confidence": 0.9,
+      "latency_ms": 2056
+    },
+    {
+      "id": "q15",
+      "question": "Ticket P1 lúc 2am. Cần cấp Level 2 access tạm thời cho contractor để thực hiện emergency fix. Đồng thời cần notify stakeholders theo SLA. Nêu đủ cả hai quy trình.",
+      "answer": "Để cấp Level 2 access tạm thời cho contractor và notify stakeholders theo SLA cho ticket P1, quy trình sẽ như sau:\n\n**Quy trình cấp Level 2 access tạm thời:**\n1. On-call IT Admin có thể cấp quyền tạm thời (tối đa 24 giờ) sau khi được Tech Lead phê duyệt bằng lời.\n2. Sau 24 giờ, phải có ticket chính thức hoặc quyền sẽ bị thu hồi tự động.\n3. Mọi quyền tạm thời phải được ghi log vào hệ thống Security Audit [1].\n\n**Quy trình notify stakeholders theo SLA cho ticket P1:**\n1. Ngay khi nhận ticket, cần thông báo cho các stakeholder.\n2. Cập nhật tình hình mỗi 30 phút cho đến khi sự cố được giải quyết [2].\n\nNhư vậy, cả hai quy trình đã được nêu rõ để thực hiện yêu cầu trong tình huống khẩn cấp này.",
+      "confidence": 0.9,
+      "latency_ms": 3913
     }
   ]
 }

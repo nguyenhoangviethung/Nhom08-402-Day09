@@ -252,50 +252,51 @@ def analyze_traces(traces_dir: str = "artifacts/traces") -> dict:
 # ─────────────────────────────────────────────
 # 4. Compare Single vs Multi Agent
 # ─────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# 4. Compare Single vs Multi Agent
+# ─────────────────────────────────────────────
 
 def compare_single_vs_multi(
     multi_traces_dir: str = "artifacts/traces",
-    day08_results_file: Optional[str] = None,
+    day08_results_file: str = "artifacts/day08_baseline.json", # CHỈ ĐỊNH ĐÚNG FILE DAY 08
 ) -> dict:
     """
     So sánh Day 08 (single agent RAG) vs Day 09 (multi-agent).
-
-    TODO Sprint 4: Điền kết quả thực tế từ Day 08 vào day08_baseline.
-
-    Returns:
-        dict của comparison metrics
     """
     multi_metrics = analyze_traces(multi_traces_dir)
 
-    # TODO: Load Day 08 results nếu có
-    # Nếu không có, dùng baseline giả lập để format
+    # 1. Mặc định nếu không tìm thấy file
     day08_baseline = {
-        "total_questions": 15,
-        "avg_confidence": 0.0,          # TODO: Điền từ Day 08 eval.py
-        "avg_latency_ms": 0,            # TODO: Điền từ Day 08
-        "abstain_rate": "?",            # TODO: Điền từ Day 08
-        "multi_hop_accuracy": "?",      # TODO: Điền từ Day 08
+        "avg_confidence": 0.0,
+        "avg_latency_ms": 0,
+        "status": "NOT FOUND - Hãy chạy python eval.py trước!"
     }
 
-    if day08_results_file and os.path.exists(day08_results_file):
-        with open(day08_results_file) as f:
-            day08_baseline = json.load(f)
+    # 2. Đọc kết quả Day 08 từ file JSON
+    if os.path.exists(day08_results_file):
+        with open(day08_results_file, encoding="utf-8") as f:
+            data = json.load(f)
+            day08_baseline["avg_confidence"] = data.get("avg_confidence", 0.0)
+            day08_baseline["avg_latency_ms"] = data.get("avg_latency_ms", 0)
+            day08_baseline["status"] = "LOADED SUCCESSFULLY"
+
+    # 3. Tính toán độ chênh lệch (Delta)
+    conf_delta = multi_metrics.get("avg_confidence", 0) - day08_baseline["avg_confidence"]
+    lat_delta = multi_metrics.get("avg_latency_ms", 0) - day08_baseline["avg_latency_ms"]
 
     comparison = {
         "generated_at": datetime.now().isoformat(),
         "day08_single_agent": day08_baseline,
         "day09_multi_agent": multi_metrics,
         "analysis": {
-            "routing_visibility": "Day 09 có route_reason cho từng câu → dễ debug hơn Day 08",
-            "latency_delta": "TODO: Điền delta latency thực tế",
-            "accuracy_delta": "TODO: Điền delta accuracy thực tế từ grading",
-            "debuggability": "Multi-agent: có thể test từng worker độc lập. Single-agent: không thể.",
-            "mcp_benefit": "Day 09 có thể extend capability qua MCP không cần sửa core. Day 08 phải hard-code.",
+            "confidence_improvement": f"{conf_delta:+.3f} điểm (Độ tin cậy)",
+            "latency_difference": f"{lat_delta:+} ms (Multi-Agent thường chậm hơn do phải gọi nhiều tool)",
+            "routing_visibility": "Day 09 rõ ràng luồng đi (route_reason), dễ debug hơn Day 08 rất nhiều.",
+            "mcp_benefit": f"Day 09 sử dụng External Tools trong {multi_metrics.get('mcp_usage_rate', '0%')} số câu hỏi (Day 08 không làm được).",
         },
     }
 
     return comparison
-
 
 # ─────────────────────────────────────────────
 # 5. Save Eval Report
