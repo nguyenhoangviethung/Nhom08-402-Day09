@@ -206,15 +206,43 @@ def retrieve_hybrid(query: str, top_k: int = 3):
 
 def run(state: dict) -> dict:
     task = state.get("task", "")
+    top_k = state.get("top_k", DEFAULT_TOP_K)
     mode = state.get("retrieval_mode", "dense") # Mặc định dense, có thể đổi sang hybrid
     
-    if mode == "hybrid":
-        chunks = retrieve_hybrid(task)
-    else:
-        chunks = retrieve_dense(task)
+    if "worker_io_logs" not in state:
+        state["worker_io_logs"] = []
         
-    state["retrieved_chunks"] = chunks
-    state["retrieved_sources"] = list({c.get("source", "unknown") for c in chunks})
+    io_log = {
+        "worker": WORKER_NAME,
+        "input": {"task": task, "top_k": top_k, "mode": mode}
+    }
+    
+    if not task:
+        state["error"] = {"code": "RETRIEVAL_FAILED", "reason": "Missing 'task' in input"}
+        io_log["error"] = state.get("error")
+        state["worker_io_logs"].append(io_log)
+        return state
+
+    try:
+        if mode == "hybrid":
+            chunks = retrieve_hybrid(task, top_k=top_k)
+        else:
+            chunks = retrieve_dense(task, top_k=top_k)
+            
+        state["retrieved_chunks"] = chunks
+        state["retrieved_sources"] = list({c.get("source", "unknown") for c in chunks})
+        
+        io_log["output"] = {
+            "retrieved_chunks_count": len(chunks),
+            "retrieved_sources": state["retrieved_sources"]
+        }
+    except Exception as e:
+        state["error"] = {"code": "RETRIEVAL_FAILED", "reason": str(e)}
+        state["retrieved_chunks"] = []
+        state["retrieved_sources"] = []
+        io_log["error"] = state["error"]
+
+    state["worker_io_logs"].append(io_log)
     return state
 
 
