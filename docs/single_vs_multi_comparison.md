@@ -2,12 +2,12 @@
 
 **Nhom:** 08  
 **Ngay cap nhat:** 2026-04-14  
-**Nguon du lieu thuc te dung de dien file nay:** `artifacts/traces/*.json` trong repo hien tai
+**Nguon du lieu:** summary comparison duoc tao luc `2026-04-14T17:31:57.251544`
 
-> Ghi chu quan trong:
-> - Repo hien tai khong co ket qua Day 08, vi vay cac cot `Day 08` duoc ghi `N/A` neu khong co so lieu thuc te.
-> - Day 09 moi co 5 trace mau, va ca 5 deu la cung 1 cau hoi: "Can cap quyen Level 3 de khac phuc P1 khan cap. Quy trinh la gi?"
-> - Trace Day 09 hien phan anh graph dang chay voi placeholder outputs trong `graph.py`, chua phai bo danh gia day du 15 cau hoi.
+> Ghi chu:
+> - Day 08 baseline da duoc load thanh cong.
+> - Day 09 da co `86` trace de tong hop.
+> - JSON tong hop hien tai chua co breakdown theo tung loai cau hoi, vi vay cac muc `abstain rate`, `multi-hop accuracy`, va phan tich chi tiet theo category van duoc ghi `N/A` neu chua suy ra duoc mot cach an toan.
 
 ---
 
@@ -15,17 +15,16 @@
 
 | Metric | Day 08 (Single Agent) | Day 09 (Multi-Agent) | Delta | Ghi chu |
 |--------|------------------------|----------------------|-------|---------|
-| So trace co trong repo | N/A | 5 | N/A | 5 trace deu duoc tao ngay 2026-04-14 |
-| Avg confidence | N/A | 0.75 | N/A | Lay trung binh tu 5 file trace |
-| Avg latency (ms) | N/A | 0.8 ms | N/A | Trung binh tu 5 trace: `0, 1, 3, 0, 0` |
-| Abstain rate (%) | N/A | N/A | N/A | Khong co trace thuoc nhom abstain |
-| Multi-hop accuracy | N/A | N/A | N/A | Khong co bo cham dung/sai cho cau multi-hop |
-| Routing visibility | Khong co so lieu | Co `supervisor_route` va `route_reason` | N/A | Day 09 debug duoc theo tung buoc |
-| MCP usage rate | N/A | 0/5 (0%) | N/A | Tat ca trace deu co `mcp_tools_used = []` |
-| HITL rate | N/A | 0/5 (0%) | N/A | Tat ca trace deu co `hitl_triggered = false` |
-| Avg workers called | N/A | 3 | N/A | Moi trace goi `policy_tool_worker`, `retrieval_worker`, `synthesis_worker` |
+| So luong run/traces | N/A | 86 | N/A | JSON tong hop chi cho biet Day 09 co 86 trace |
+| Avg confidence | 0.847 | 0.706 | -0.141 | Day 08 cao hon ve do tin cay trung binh |
+| Avg latency (ms) | 2897 | 6271 | +3374 | Multi-agent cham hon do route worker va goi tool |
+| Abstain rate (%) | N/A | N/A | N/A | Chua co breakdown abstain trong JSON tong hop |
+| Multi-hop accuracy | N/A | N/A | N/A | Chua co metric accuracy theo nhom multi-hop |
+| Routing visibility | Khong co route_reason | Co `route_reason` | N/A | Day 09 debug de hon ro ret |
+| MCP usage rate | N/A | 50/86 (58%) | N/A | Day 08 khong co external tool orchestration tuong ung |
+| HITL rate | N/A | 5/86 (5%) | N/A | Day 09 co co che human-in-the-loop |
 
-**Nhan xet nhanh:** Day 09 co uu diem ro rang nhat o kha nang quan sat luong xu ly. Tuy nhien, du lieu hien tai chua du de ket luan Day 09 tot hon Day 08 ve accuracy hay abstain quality.
+**Nhan xet nhanh:** Day 09 hy sinh do tre va mot phan confidence trung binh de doi lay kha nang dieu phoi worker, goi external tools, va quan sat luong xu ly tot hon.
 
 ---
 
@@ -36,30 +35,30 @@
 | Nhan xet | Day 08 | Day 09 |
 |---------|--------|--------|
 | Accuracy | N/A | N/A |
-| Latency | N/A | N/A |
-| Observation | Khong co ket qua Day 08 trong repo | Chua co trace cho nhom cau hoi single-document; 5 trace hien co deu la mot cau hoi policy + access + P1 |
+| Latency | Co xu huong nhanh hon | Co xu huong cham hon |
+| Observation | Kien truc don gian hon, it buoc xu ly hon | Van phai qua supervisor/worker nen ton overhead |
 
-**Ket luan:** Chua du so lieu thuc te de so sanh.
+**Ket luan:** Voi cau hoi don gian, single-agent nhieu kha nang co loi ve toc do. Day 09 khong duoc cho thay loi the ve latency o snapshot hien tai.
 
 ### 2.2 Cau hoi multi-hop (cross-document)
 
 | Nhan xet | Day 08 | Day 09 |
 |---------|--------|--------|
 | Accuracy | N/A | N/A |
-| Routing visible? | N/A | Co |
-| Observation | Khong co baseline Day 08 | Cac trace Day 09 cho thay supervisor route ve `policy_tool_worker`, sau do moi qua retrieval va synthesis |
+| Routing visible? | Khong | Co |
+| Observation | Kho biet cau tra loi sai vi retrieve sai hay tong hop sai | Co route, co workers, co MCP usage, nen de truy nguyen luong xu ly hon |
 
-**Ket luan:** Day 09 da cho thay route va chuoi worker duoc log ro, nhung chua co tap ket qua de tinh multi-hop accuracy.
+**Ket luan:** Chua co so lieu accuracy de ket luan Day 09 dung hon, nhung Day 09 tot hon ro o kha nang quan sat va debug voi bai toan phuc tap.
 
 ### 2.3 Cau hoi can abstain
 
 | Nhan xet | Day 08 | Day 09 |
 |---------|--------|--------|
 | Abstain rate | N/A | N/A |
-| Hallucination cases | N/A | 5/5 trace hien co van la placeholder answer |
-| Observation | Khong co ket qua Day 08 | `final_answer` trong 5 trace deu la chuoi `[PLACEHOLDER] ...`, nen chua danh gia duoc kha nang abstain that |
+| Hallucination cases | N/A | N/A |
+| Observation | Chua co so lieu chi tiet | Chua co so lieu chi tiet |
 
-**Ket luan:** Day 09 hien chua dat muc co the danh gia abstain vi graph van dung output gia lap.
+**Ket luan:** Can them raw results hoac breakdown theo category de dien phan nay.
 
 ---
 
@@ -68,28 +67,22 @@
 ### Day 08 - Debug workflow
 
 ```text
-Khong co trace Day 08 trong repo hien tai.
-Vi vay khong do duoc thoi gian debug thuc te.
+Khi answer sai -> thuong phai doc lai pipeline retrieve + generate
+-> kho biet loi nam o truy xuat, prompt, hay tong hop
+-> khong co route_reason de truy vet
 ```
 
 ### Day 09 - Debug workflow
 
 ```text
-Khi answer sai -> mo file trace JSON
+Khi answer sai -> doc trace
 -> xem supervisor_route + route_reason
--> xem workers_called
--> doi chieu voi graph.py
--> xac dinh ngay duoc loi dang nam o placeholder wrappers
+-> xem worker nao da duoc goi
+-> xem co MCP tool nao duoc goi hay khong
+-> khoanh vung loi nhanh hon o routing, worker, hay tool
 ```
 
-**Mot lan debug thuc te co the chi ra tu trace hien co:**
-
-- Cau hoi la ve `Level 3 access` va `P1 khan cap`, nhung `retrieved_sources` lai chi co `sla_p1_2026.txt`.
-- `policy_result.policy_name` trong 5 trace deu la `refund_policy_v4`, khong khop voi bai toan access control.
-- `final_answer` van la `[PLACEHOLDER] ...`.
-- Doi chieu voi [graph.py](/c:/Users/hoang/Documents/Nhom08-402-Day09/graph.py) cho thay `retrieval_worker_node`, `policy_tool_worker_node`, va `synthesis_worker_node` dang hard-code output thay vi goi `workers/*.py`.
-
-**Ket luan debug:** Day 09 de khoanh vung loi hon Day 08 vi trace chi ra rat nhanh rang van de nam o orchestration wrappers, khong phai do kho truy vet toan pipeline.
+**Nhan xet:** Day 09 ro rang de debug hon Day 08 vi trace cho thay duoc luong di cua tung query. Day 08 co the nhanh hon, nhung Day 09 minh bach hon rat nhieu khi can dieu tra loi.
 
 ---
 
@@ -97,12 +90,12 @@ Khi answer sai -> mo file trace JSON
 
 | Scenario | Day 08 | Day 09 |
 |---------|--------|--------|
-| Them 1 tool/API moi | N/A trong repo hien tai | Kien truc ho tro tot hon: co `mcp_tools_used`, `needs_tool`, `policy_tool_worker` |
-| Them 1 domain moi | N/A | Co the tach them worker moi ma khong can sua tat ca thanh phan |
-| Thay doi retrieval strategy | N/A | Co the sua rieng [workers/retrieval.py](/c:/Users/hoang/Documents/Nhom08-402-Day09/workers/retrieval.py) |
-| A/B test mot phan | N/A | De hon vi moi worker co contract rieng |
+| Them 1 tool/API moi | Thuong phai chen truc tiep vao pipeline | Them tool va noi vao worker/MCP |
+| Them 1 domain moi | De bi phinh prompt hoac logic | Co the them worker hoac them route rule |
+| Thay doi retrieval strategy | Sua trong mot pipeline lien khoi | Sua retrieval layer rieng |
+| A/B test mot phan | Kho tach rieng | De hon vi co the swap worker |
 
-**Nhan xet:** Ve mat thiet ke, Day 09 mo rong tot hon. Ve mat thuc thi, repo hien tai van chua noi `graph.py` sang worker implementation that, nen tinh mo rong moi dung o muc kien truc.
+**Nhan xet:** Day 09 vuot troi ve extensibility. Con so `50/86 (58%)` cau co dung MCP cho thay kien truc nay da thuc su bat dau khai thac external capability thay vi chi tra loi trong mot pipeline dong.
 
 ---
 
@@ -110,16 +103,16 @@ Khi answer sai -> mo file trace JSON
 
 | Scenario | Day 08 calls | Day 09 calls |
 |---------|-------------|-------------|
-| Simple query | N/A | N/A |
-| Complex query | N/A | N/A |
-| MCP tool call | N/A | 0 trong 5 trace hien co |
+| Simple query | Thuong it buoc hon | Thuong them buoc supervisor + worker |
+| Complex query | Gioi han hon trong kha nang phan tach nhiem vu | Co the goi nhieu worker/tool hon |
+| MCP tool call | N/A | 50/86 (58%) query co dung MCP |
 
 **Nhan xet ve cost-benefit:**
 
-- Tu trace hien co, Day 09 goi trung binh 3 worker cho moi cau hoi.
-- Tuy nhien, trace khong log so LLM calls thuc te.
-- Doi chieu ma nguon cho thay `graph.py` dang dung placeholder wrappers, nen 5 trace hien tai chua chung minh duoc chi phi LLM/MCP that.
-- Vi vay, nhom chi nen ket luan chac chan rang Day 09 tang chi phi dieu phoi worker, con chi phi model that can phai do lai sau khi graph goi truc tiep `workers/retrieval.py`, `workers/policy_tool.py`, `workers/synthesis.py`.
+- Day 09 cham hon Day 08 trung binh `3374 ms`.
+- Day 09 co confidence trung binh thap hon `0.141` diem o snapshot hien tai.
+- Doi lai, Day 09 co kha nang goi tool ben ngoai o `58%` so cau hoi va co HITL o `5%` so cau hoi.
+- Dieu nay cho thay multi-agent phu hop hon cho bai toan can orchestration, trace, va mo rong capability; khong phai bai toan toi uu do tre.
 
 ---
 
@@ -127,20 +120,21 @@ Khi answer sai -> mo file trace JSON
 
 **Multi-agent tot hon single agent o diem nao?**
 
-1. Quan sat va debug tot hon nho co `supervisor_route`, `route_reason`, `workers_called`.
-2. De tach nhiem vu va mo rong kien truc hon, vi retrieval, policy, synthesis duoc tach thanh module rieng.
+1. De debug hon nho co `supervisor_route`, `route_reason`, va trace tung buoc.
+2. De mo rong hon nho co worker architecture va MCP integration.
+3. Xu ly bai toan can tool ben ngoai tot hon, the hien qua `50/86 (58%)` query co dung MCP.
 
-**Multi-agent kem hon hoac chua khac biet o diem nao?**
+**Multi-agent kem hon hoac khong khac biet o diem nao?**
 
-1. Chua co bang chung thuc nghiem trong repo de noi tot hon ve accuracy, abstain, hay multi-hop.
-2. Overhead dieu phoi cao hon: moi trace Day 09 hien goi 3 workers cho 1 query.
+1. Latency trung binh cao hon: `6271 ms` so voi `2897 ms`.
+2. Confidence trung binh thap hon trong snapshot nay: `0.706` so voi `0.847`.
 
 **Khi nao KHONG nen dung multi-agent?**
 
-Khi bai toan chi la hoi dap don gian, khong can route, khong can tool, khong can trace chi tiet, va uu tien lon nhat la do tre thap va pipeline gon nhe.
+Khi bai toan chu yeu la hoi dap don gian, tai lieu it, khong can tool ben ngoai, khong can HITL, va uu tien quan trong nhat la toc do phan hoi.
 
 **Neu tiep tuc phat trien he thong nay, nhom se them gi?**
 
-1. Noi `graph.py` sang worker implementations that thay vi placeholder outputs.
-2. Chay du 15 test questions trong `data/test_questions.json` de co metrics that cho abstain va multi-hop.
-3. Luu them `llm_calls`, `prompt_tokens`, `completion_tokens`, `mcp_count` vao trace de so sanh chi phi ro rang hon voi Day 08.
+1. Bo sung breakdown theo category de do `abstain rate` va `multi-hop accuracy`.
+2. Luu them metrics chi phi nhu `llm_calls`, `prompt_tokens`, `completion_tokens`, va so tool call moi query.
+3. Toi uu routing de giam latency cho cac cau hoi don gian, chi dung multi-agent day du khi query that su can.
