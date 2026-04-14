@@ -11,4 +11,3 @@ __pycache__/
 *.bak
 *.swp
 chroma_db/
-index.py

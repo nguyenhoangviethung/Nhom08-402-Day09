@@ -9,6 +9,10 @@ chromadb>=0.4.22
 
 # ─── Embeddings ─────────────────────────
 # Option A: Sentence Transformers (offline, không cần API key)
+# Chỉ định nguồn tải PyTorch bản CPU để tránh tải bản CUDA nặng nề
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
 sentence-transformers>=2.6.0
 
 # ─── LLM ────────────────────────────────
