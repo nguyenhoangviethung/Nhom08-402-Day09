@@ -30,11 +30,17 @@ WORKER_NAME = "retrieval_worker"
 DEFAULT_TOP_K = 3
 
 
+_cached_embed_fn = None
+
 def _get_embedding_fn():
     """
     Trả về một 'hàm đóng' (closure) để thực hiện embedding.
     Cơ chế: Thử Local trước -> Thử API sau -> Cuối cùng là Random.
     """
+    global _cached_embed_fn
+    if _cached_embed_fn is not None:
+        return _cached_embed_fn
+        
     # 1. THỬ DÙNG LOCAL (Phù hợp với Lab 8 bạn đã làm)
     try:
         from sentence_transformers import SentenceTransformer
@@ -45,6 +51,8 @@ def _get_embedding_fn():
         def embed(text: str) -> list:
             # model.encode trả về numpy array, cần .tolist() để ChromaDB nhận
             return model.encode(text).tolist()
+            
+        _cached_embed_fn = embed
         return embed
     except (ImportError, Exception):
         # Nếu chưa cài thư viện hoặc không load được model, nhảy xuống Option B
@@ -60,6 +68,8 @@ def _get_embedding_fn():
                 # model text-embedding-3-small rẻ và hiệu quả
                 resp = client.embeddings.create(input=[text], model="text-embedding-3-small")
                 return resp.data[0].embedding
+                
+            _cached_embed_fn = embed
             return embed
     except (ImportError, Exception):
         pass
@@ -69,12 +79,14 @@ def _get_embedding_fn():
     def embed(text: str) -> list:
         # 768 là số chiều của model BKAI bạn dùng ở Lab 8
         return [random.random() for _ in range(768)]
+        
+    _cached_embed_fn = embed
     return embed
 
 
 def _get_collection():
     """
-    Kết nối ChromaDB collection 'rag_lab' từ Lab 8.
+    Kết nối ChromaDB collection '{CHROMA_COLLECTION}' trong folder 'chroma_db' ở thư mục gốc.
     Đảm bảo đường dẫn chính xác dù chạy từ thư mục workers/ hay thư mục gốc.
     """
     import chromadb
@@ -167,6 +179,7 @@ def retrieve_sparse(query: str, top_k: int = 5):
     
     return [{
         "text": corpus[i],
+        "source": all_data["metadatas"][i].get("source", "unknown") if all_data["metadatas"][i] else "unknown",
         "metadata": all_data["metadatas"][i],
         "score": float(doc_scores[i])
     } for i in top_indices]
@@ -201,7 +214,7 @@ def run(state: dict) -> dict:
         chunks = retrieve_dense(task)
         
     state["retrieved_chunks"] = chunks
-    state["retrieved_sources"] = list({c["source"] for c in chunks})
+    state["retrieved_sources"] = list({c.get("source", "unknown") for c in chunks})
     return state
 
 
@@ -221,8 +234,8 @@ if __name__ == "__main__":
     ]
 
     for query in test_queries:
-        print(f"\n▶ Query: {query}")
-        result = run({"task": query})
+        print(f"\n▶ Query: {query} (Hybrid Mode)")
+        result = run({"task": query, "retrieval_mode": "hybrid"})
         chunks = result.get("retrieved_chunks", [])
         print(f"  Retrieved: {len(chunks)} chunks")
         for c in chunks[:2]:
