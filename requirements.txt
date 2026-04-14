@@ -1,7 +1,13 @@
-# Day 09 Lab — Multi-Agent Orchestration
-# Install: pip install -r requirements.txt
+# Day 08 Lab — RAG Pipeline
+# Cài đặt: pip install -r requirements.txt
 
-# ─── Core ───────────────────────────────
+# === PyTorch CPU ===
+# Chỉ định nguồn tải PyTorch bản CPU để tránh tải bản CUDA nặng nề
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+
+# === Core ===
 python-dotenv>=1.0.0
 
 # ─── Vector Store ───────────────────────

@@ -160,6 +160,7 @@ def chunk_document(doc: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 # Cache embedding model (khởi tạo 1 lần, dùng chung)
 _embedding_model = None
+_embedding_mode = None
 
 def _split_by_size(
     text: str,
@@ -239,14 +240,48 @@ def get_embedding(text: str) -> List[float]:
     Dùng SentenceTransformer local với model khai báo trong .env:
       LOCAL_EMBEDDING_MODEL=bkai-foundation-models/vietnamese-bi-encoder
     """
-    global _embedding_model
-    if _embedding_model is None:
-        from sentence_transformers import SentenceTransformer
-        model_name = os.getenv("LOCAL_EMBEDDING_MODEL", "bkai-foundation-models/vietnamese-bi-encoder")
-        print(f"  [Embedding] Đang load model: {model_name}")
-        _embedding_model = SentenceTransformer(model_name)
-        print("  [Embedding] Load model xong!")
-    return _embedding_model.encode(text).tolist()
+    global _embedding_model, _embedding_mode
+    if _embedding_mode is None:
+        # 1) Try local SentenceTransformer first
+        try:
+            from sentence_transformers import SentenceTransformer
+            model_name = os.getenv("LOCAL_EMBEDDING_MODEL", "bkai-foundation-models/vietnamese-bi-encoder")
+            print(f"  [Embedding] Đang load model: {model_name}")
+            _embedding_model = SentenceTransformer(model_name)
+            _embedding_mode = "local"
+            print("  [Embedding] Load model xong!")
+        except Exception as exc:
+            print(f"  [Embedding] ⚠️ Local model lỗi: {exc}")
+
+        # 2) Fallback to OpenAI if available
+        if _embedding_mode is None:
+            try:
+                from openai import OpenAI
+                api_key = os.getenv("OPENAI_API_KEY")
+                if api_key:
+                    _embedding_model = OpenAI(api_key=api_key)
+                    _embedding_mode = "openai"
+                    print("  [Embedding] Dùng OpenAI embedding fallback.")
+            except Exception as exc:
+                print(f"  [Embedding] ⚠️ OpenAI fallback lỗi: {exc}")
+
+        # 3) Final fallback: random vectors (debug only)
+        if _embedding_mode is None:
+            _embedding_mode = "random"
+            print("  [Embedding] ⚠️ Dùng random embedding (debug only).")
+
+    if _embedding_mode == "local":
+        return _embedding_model.encode(text).tolist()
+    if _embedding_mode == "openai":
+        try:
+            resp = _embedding_model.embeddings.create(input=[text], model="text-embedding-3-small")
+            return resp.data[0].embedding
+        except Exception as exc:
+            print(f"  [Embedding] ⚠️ OpenAI call lỗi: {exc}")
+            _embedding_mode = "random"
+
+    import random
+    return [random.random() for _ in range(768)]
 
 
 def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None:
@@ -267,7 +302,7 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
         import chromadb
         client = chromadb.PersistentClient(path=str(db_dir))
         collection = client.get_or_create_collection(
-            name="rag_lab",
+            name=os.getenv("CHROMA_COLLECTION", ""),
             metadata={"hnsw:space": "cosine"}
         )
     """
@@ -280,7 +315,7 @@ def build_index(docs_dir: Path = DOCS_DIR, db_dir: Path = CHROMA_DB_DIR) -> None
     # Khởi tạo ChromaDB
     client = chromadb.PersistentClient(path=str(db_dir))
     collection = client.get_or_create_collection(
-        name="rag_lab",
+        name=os.getenv("CHROMA_COLLECTION", ""),
         metadata={"hnsw:space": "cosine"}
     )
 
@@ -332,7 +367,7 @@ def list_chunks(db_dir: Path = CHROMA_DB_DIR, n: int = 5) -> None:
     try:
         import chromadb
         client = chromadb.PersistentClient(path=str(db_dir))
-        collection = client.get_collection("rag_lab")
+        collection = client.get_collection(os.getenv("CHROMA_COLLECTION", ""))
         results = collection.get(limit=n, include=["documents", "metadatas"])
 
         print(f"\n=== Top {n} chunks trong index ===\n")
@@ -362,7 +397,7 @@ def inspect_metadata_coverage(db_dir: Path = CHROMA_DB_DIR) -> None:
     try:
         import chromadb
         client = chromadb.PersistentClient(path=str(db_dir))
-        collection = client.get_collection("rag_lab")
+        collection = client.get_collection(os.getenv("CHROMA_COLLECTION", ""))
         results = collection.get(include=["metadatas"])
 
         print(f"\nTổng chunks: {len(results['metadatas'])}")

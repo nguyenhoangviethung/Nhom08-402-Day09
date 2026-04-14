@@ -14,8 +14,8 @@ import os
 from datetime import datetime
 from typing import TypedDict, Literal, Optional
 
-# Uncomment nếu dùng LangGraph:
-# from langgraph.graph import StateGraph, END
+# Dùng LangGraph:
+from langgraph.graph import StateGraph, END
 
 # ─────────────────────────────────────────────
 # 1. Shared State — dữ liệu đi xuyên toàn graph
@@ -83,42 +83,31 @@ def supervisor_node(state: AgentState) -> AgentState:
     1. Route sang worker nào
     2. Có cần MCP tool không
     3. Có risk cao cần HITL không
-
-    TODO Sprint 1: Implement routing logic dựa vào task keywords.
     """
     task = state["task"].lower()
     state["history"].append(f"[supervisor] received task: {state['task'][:80]}")
 
-    # --- TODO: Implement routing logic ---
-    # Gợi ý:
-    # - "hoàn tiền", "refund", "flash sale", "license" → policy_tool_worker
-    # - "cấp quyền", "access level", "level 3", "emergency" → policy_tool_worker
-    # - "P1", "escalation", "sla", "ticket" → retrieval_worker
-    # - mã lỗi không rõ (ERR-XXX), không đủ context → human_review
-    # - còn lại → retrieval_worker
-
-    route = "retrieval_worker"         # TODO: thay bằng logic thực
-    route_reason = "default route"    # TODO: thay bằng lý do thực
+    route = "retrieval_worker"         
+    route_reason = "default route"    
     needs_tool = False
     risk_high = False
 
-    # Ví dụ routing cơ bản — nhóm phát triển thêm:
     policy_keywords = ["hoàn tiền", "refund", "flash sale", "license", "cấp quyền", "access", "level 3"]
     risk_keywords = ["emergency", "khẩn cấp", "2am", "không rõ", "err-"]
 
     if any(kw in task for kw in policy_keywords):
         route = "policy_tool_worker"
-        route_reason = f"task contains policy/access keyword"
+        route_reason = "task chứa keyword liên quan policy/quyền truy cập"
         needs_tool = True
 
     if any(kw in task for kw in risk_keywords):
         risk_high = True
-        route_reason += " | risk_high flagged"
+        route_reason += " | bật cờ risk_high"
 
     # Human review override
     if risk_high and "err-" in task:
         route = "human_review"
-        route_reason = "unknown error code + risk_high → human review"
+        route_reason = "mã lỗi lạ + risk_high -> dừng lại cần human review"
 
     state["supervisor_route"] = route
     state["route_reason"] = route_reason
@@ -235,44 +224,63 @@ def synthesis_worker_node(state: AgentState) -> AgentState:
 
 def build_graph():
     """
-    Xây dựng graph với supervisor-worker pattern.
-
-    Option A (đơn giản — Python thuần): Dùng if/else, không cần LangGraph.
-    Option B (nâng cao): Dùng LangGraph StateGraph với conditional edges.
-
-    Lab này implement Option A theo mặc định.
-    TODO Sprint 1: Có thể chuyển sang LangGraph nếu muốn.
+    Xây dựng graph với supervisor-worker pattern sử dụng LangGraph.
     """
-    # Option A: Simple Python orchestrator
+    # Khởi tạo đồ thị
+    workflow = StateGraph(AgentState)
+
+    # Đăng ký các Nodes
+    workflow.add_node("supervisor", supervisor_node)
+    workflow.add_node("human_review", human_review_node)
+    workflow.add_node("retrieval_worker", retrieval_worker_node)
+    workflow.add_node("policy_tool_worker", policy_tool_worker_node)
+    workflow.add_node("synthesis_worker", synthesis_worker_node)
+
+    # Đặt điểm bắt đầu
+    workflow.set_entry_point("supervisor")
+
+    # Routing có điều kiện từ Supervisor
+    workflow.add_conditional_edges(
+        "supervisor",
+        route_decision,
+        {
+            "human_review": "human_review",
+            "policy_tool_worker": "policy_tool_worker",
+            "retrieval_worker": "retrieval_worker"
+        }
+    )
+
+    # Luồng xử lý tuần tự (Edges)
+    # Sau khi human review xong -> chuyển qua lấy chứng cứ
+    workflow.add_edge("human_review", "retrieval_worker")
+    
+    # Định tuyến sau policy_tool_worker
+    def policy_next_edge(state: AgentState):
+        if not state.get("retrieved_chunks"):
+            return "retrieval_worker"
+        return "synthesis_worker"
+        
+    workflow.add_conditional_edges("policy_tool_worker", policy_next_edge)
+    
+    # Sau khi retrieval xong -> tổng hợp thành answer
+    workflow.add_edge("retrieval_worker", "synthesis_worker")
+    
+    # Đóng graph
+    workflow.add_edge("synthesis_worker", END)
+
+    # Biên dịch đồ thị
+    app = workflow.compile()
+
     def run(state: AgentState) -> AgentState:
         import time
         start = time.time()
 
-        # Step 1: Supervisor decides route
-        state = supervisor_node(state)
+        # Thực thi LangGraph
+        final_state = app.invoke(state)
 
-        # Step 2: Route to appropriate worker
-        route = route_decision(state)
-
-        if route == "human_review":
-            state = human_review_node(state)
-            # After human approval, continue with retrieval
-            state = retrieval_worker_node(state)
-        elif route == "policy_tool_worker":
-            state = policy_tool_worker_node(state)
-            # Policy worker may need retrieval context first
-            if not state["retrieved_chunks"]:
-                state = retrieval_worker_node(state)
-        else:
-            # Default: retrieval_worker
-            state = retrieval_worker_node(state)
-
-        # Step 3: Always synthesize
-        state = synthesis_worker_node(state)
-
-        state["latency_ms"] = int((time.time() - start) * 1000)
-        state["history"].append(f"[graph] completed in {state['latency_ms']}ms")
-        return state
+        final_state["latency_ms"] = int((time.time() - start) * 1000)
+        final_state["history"].append(f"[graph] completed in {final_state['latency_ms']}ms")
+        return final_state
 
     return run
 
