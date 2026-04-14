@@ -1,6 +1,6 @@
 """
 graph.py — Supervisor Orchestrator
-Sprint 1: Implement AgentState, supervisor_node, route_decision và kết nối graph.
+Sprint 2+3: Kết nối đồ thị (Graph) với các Worker thực tế.
 
 Kiến trúc:
     Input → Supervisor → [retrieval_worker | policy_tool_worker | human_review] → synthesis → Output
@@ -16,6 +16,11 @@ from typing import TypedDict, Literal, Optional
 
 # Dùng LangGraph:
 from langgraph.graph import StateGraph, END
+
+# Import các Worker thực tế (Sprint 2+3)
+from workers.retrieval import run as retrieval_run
+from workers.policy_tool import run as policy_tool_run
+from workers.synthesis import run as synthesis_run
 
 # ─────────────────────────────────────────────
 # 1. Shared State — dữ liệu đi xuyên toàn graph
@@ -48,6 +53,7 @@ class AgentState(TypedDict):
     supervisor_route: str               # Worker được chọn bởi supervisor
     latency_ms: Optional[int]           # Thời gian xử lý (ms)
     run_id: str                         # ID của run này
+    worker_io_logs: list                # Log I/O của các workers
 
 
 def make_initial_state(task: str) -> AgentState:
@@ -70,6 +76,7 @@ def make_initial_state(task: str) -> AgentState:
         "supervisor_route": "",
         "latency_ms": None,
         "run_id": f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+        "worker_io_logs": []
     }
 
 
@@ -92,12 +99,12 @@ def supervisor_node(state: AgentState) -> AgentState:
     needs_tool = False
     risk_high = False
 
-    policy_keywords = ["hoàn tiền", "refund", "flash sale", "license", "cấp quyền", "access", "level 3"]
+    policy_keywords = ["hoàn tiền", "refund", "flash sale", "license", "cấp quyền", "access", "level 3", "ticket", "p1"]
     risk_keywords = ["emergency", "khẩn cấp", "2am", "không rõ", "err-"]
 
     if any(kw in task for kw in policy_keywords):
         route = "policy_tool_worker"
-        route_reason = "task chứa keyword liên quan policy/quyền truy cập"
+        route_reason = "task chứa keyword liên quan policy/quyền truy cập/ticket"
         needs_tool = True
 
     if any(kw in task for kw in risk_keywords):
@@ -138,10 +145,6 @@ def route_decision(state: AgentState) -> Literal["retrieval_worker", "policy_too
 def human_review_node(state: AgentState) -> AgentState:
     """
     HITL node: pause và chờ human approval.
-    Trong lab này, implement dưới dạng placeholder (in ra warning).
-
-    TODO Sprint 3 (optional): Implement actual HITL với interrupt_before hoặc
-    breakpoint nếu dùng LangGraph.
     """
     state["hitl_triggered"] = True
     state["history"].append("[human_review] HITL triggered — awaiting human input")
@@ -161,61 +164,26 @@ def human_review_node(state: AgentState) -> AgentState:
 
 
 # ─────────────────────────────────────────────
-# 5. Import Workers
+# 5. Worker Nodes (Gọi logic thực tế)
 # ─────────────────────────────────────────────
 
-# TODO Sprint 2: Uncomment sau khi implement workers
-# from workers.retrieval import run as retrieval_run
-# from workers.policy_tool import run as policy_tool_run
-# from workers.synthesis import run as synthesis_run
-
-
 def retrieval_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi retrieval worker."""
-    # TODO Sprint 2: Thay bằng retrieval_run(state)
+    """Wrapper gọi retrieval worker thực tế."""
     state["workers_called"].append("retrieval_worker")
     state["history"].append("[retrieval_worker] called")
-
-    # Placeholder output để test graph chạy được
-    state["retrieved_chunks"] = [
-        {"text": "SLA P1: phản hồi 15 phút, xử lý 4 giờ.", "source": "sla_p1_2026.txt", "score": 0.92}
-    ]
-    state["retrieved_sources"] = ["sla_p1_2026.txt"]
-    state["history"].append(f"[retrieval_worker] retrieved {len(state['retrieved_chunks'])} chunks")
-    return state
+    return retrieval_run(state)
 
 
 def policy_tool_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi policy/tool worker."""
-    # TODO Sprint 2: Thay bằng policy_tool_run(state)
-    state["workers_called"].append("policy_tool_worker")
-    state["history"].append("[policy_tool_worker] called")
-
-    # Placeholder output
-    state["policy_result"] = {
-        "policy_applies": True,
-        "policy_name": "refund_policy_v4",
-        "exceptions_found": [],
-        "source": "policy_refund_v4.txt",
-    }
-    state["history"].append("[policy_tool_worker] policy check complete")
-    return state
+    """Wrapper gọi policy/tool worker thực tế."""
+    # Worker này tự append vào workers_called bên trong code của nó, 
+    # nhưng gọi trực tiếp qua run() là đủ
+    return policy_tool_run(state)
 
 
 def synthesis_worker_node(state: AgentState) -> AgentState:
-    """Wrapper gọi synthesis worker."""
-    # TODO Sprint 2: Thay bằng synthesis_run(state)
-    state["workers_called"].append("synthesis_worker")
-    state["history"].append("[synthesis_worker] called")
-
-    # Placeholder output
-    chunks = state.get("retrieved_chunks", [])
-    sources = state.get("retrieved_sources", [])
-    state["final_answer"] = f"[PLACEHOLDER] Câu trả lời được tổng hợp từ {len(chunks)} chunks."
-    state["sources"] = sources
-    state["confidence"] = 0.75
-    state["history"].append(f"[synthesis_worker] answer generated, confidence={state['confidence']}")
-    return state
+    """Wrapper gọi synthesis worker thực tế."""
+    return synthesis_run(state)
 
 
 # ─────────────────────────────────────────────
@@ -226,7 +194,6 @@ def build_graph():
     """
     Xây dựng graph với supervisor-worker pattern sử dụng LangGraph.
     """
-    # Khởi tạo đồ thị
     workflow = StateGraph(AgentState)
 
     # Đăng ký các Nodes
@@ -251,11 +218,11 @@ def build_graph():
     )
 
     # Luồng xử lý tuần tự (Edges)
-    # Sau khi human review xong -> chuyển qua lấy chứng cứ
     workflow.add_edge("human_review", "retrieval_worker")
     
     # Định tuyến sau policy_tool_worker
     def policy_next_edge(state: AgentState):
+        # Nếu chưa có chunk nào (MCP tool ko lấy được), phải quay về Retrieval thuần
         if not state.get("retrieved_chunks"):
             return "retrieval_worker"
         return "synthesis_worker"
@@ -291,21 +258,13 @@ def build_graph():
 
 _graph = build_graph()
 
-
 def run_graph(task: str) -> AgentState:
     """
     Entry point: nhận câu hỏi, trả về AgentState với full trace.
-
-    Args:
-        task: Câu hỏi từ user
-
-    Returns:
-        AgentState với final_answer, trace, routing info, v.v.
     """
     state = make_initial_state(task)
     result = _graph(state)
     return result
-
 
 def save_trace(state: AgentState, output_dir: str = "./artifacts/traces") -> str:
     """Lưu trace ra file JSON."""
@@ -322,13 +281,16 @@ def save_trace(state: AgentState, output_dir: str = "./artifacts/traces") -> str
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Day 09 Lab — Supervisor-Worker Graph")
+    print("Day 09 Lab — Supervisor-Worker Graph (FULL INTEGRATION)")
     print("=" * 60)
+    
+    print("⚠️  Đảm bảo bạn đã chạy MCP Server ở một terminal khác bằng lệnh:")
+    print("   uvicorn mcp_server:app --port 8000\n")
 
     test_queries = [
         "SLA xử lý ticket P1 là bao lâu?",
         "Khách hàng Flash Sale yêu cầu hoàn tiền vì sản phẩm lỗi — được không?",
-        "Cần cấp quyền Level 3 để khắc phục P1 khẩn cấp. Quy trình là gì?",
+        "Ai phê duyệt cấp quyền Level 3?"
     ]
 
     for query in test_queries:
@@ -337,12 +299,29 @@ if __name__ == "__main__":
         print(f"  Route   : {result['supervisor_route']}")
         print(f"  Reason  : {result['route_reason']}")
         print(f"  Workers : {result['workers_called']}")
-        print(f"  Answer  : {result['final_answer'][:100]}...")
+        
+        # In thêm Policy Exceptions nếu có
+        policy = result.get('policy_result', {})
+        if policy and policy.get('exceptions_found'):
+            print(f"  ⚠️ Policy Exceptions: {policy['exceptions_found'][0].get('type')}")
+            
+        # --- THÊM ĐOẠN NÀY ĐỂ HIỂN THỊ LOG MCP ---
+        mcp_tools = result.get('mcp_tools_used', [])
+        if mcp_tools:
+            print(f"  🛠️ MCP Tools Dùng: {len(mcp_tools)}")
+            for t in mcp_tools:
+                tool_name = t.get('tool', 'unknown_tool')
+                tool_output = str(t.get('output', ''))[:80].replace('\n', ' ')
+                print(f"      - Gọi [{tool_name}] -> Kết quả: {tool_output}...")
+        else:
+            print("  🛠️ MCP Tools Dùng: 0")
+        # -----------------------------------------
+
+        print(f"  Answer  : {result['final_answer']}")
         print(f"  Confidence: {result['confidence']}")
         print(f"  Latency : {result['latency_ms']}ms")
 
         # Lưu trace
         trace_file = save_trace(result)
         print(f"  Trace saved → {trace_file}")
-
-    print("\n✅ graph.py test complete. Implement TODO sections in Sprint 1 & 2.")
+    print("\n✅ graph.py test complete. Hệ thống đã liên thông hoàn toàn!")

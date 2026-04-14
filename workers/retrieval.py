@@ -122,7 +122,7 @@ def _get_collection():
         return collection
 
 
-def retrieve_dense(query: str, top_k: int = DEFAULT_TOP_K) -> list:
+def     retrieve_dense(query: str, top_k: int = DEFAULT_TOP_K) -> list:
     # 1. Lấy hàm embed
     embed_fn = _get_embedding_fn()
     
@@ -160,7 +160,7 @@ def retrieve_dense(query: str, top_k: int = DEFAULT_TOP_K) -> list:
         return chunks
 
     except Exception as e:
-        print(f"❌ LỖI TẠI TRUY VẤN: {e}") # Đừng để 'pass' ở đây nhé Giang
+        print(f"❌ LỖI TẠI TRUY VẤN: {e}") 
         return []
 
 def retrieve_sparse(query: str, top_k: int = 5):
@@ -266,7 +266,7 @@ if __name__ == "__main__":
         result = run({"task": query, "retrieval_mode": "hybrid"})
         chunks = result.get("retrieved_chunks", [])
         print(f"  Retrieved: {len(chunks)} chunks")
-        for c in chunks[:2]:
+        for c in chunks[:3]:
             print(f"    [{c['score']:.3f}] {c['source']}: {c['text'][:80]}...")
         print(f"  Sources: {result.get('retrieved_sources', [])}")
 
