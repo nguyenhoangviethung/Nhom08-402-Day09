@@ -97,6 +97,12 @@ def run(state: dict) -> dict:
     chunks = state.get("retrieved_chunks", [])
     policy_result = state.get("policy_result", {})
 
+    state.setdefault("worker_io_logs", [])
+    io_log = {
+        "worker": WORKER_NAME,
+        "input": {"task": task, "chunks_count": len(chunks)}
+    }
+
     # Ghi log lịch sử gọi worker
     state.setdefault("workers_called", []).append(WORKER_NAME)
     state.setdefault("history", [])
@@ -107,15 +113,25 @@ def run(state: dict) -> dict:
         
         # Cập nhật kết quả vào State chung
         state["final_answer"] = result["answer"]
-        state["retrieved_sources"] = result["sources"] # Đồng bộ với các worker khác
+        state["sources"] = result["sources"] # Sửa thành keys "sources" theo contract
         state["confidence"] = result["confidence"]
         
+        io_log["output"] = {
+            "final_answer": result["answer"][:50] + "...",
+            "sources": result["sources"],
+            "confidence": result["confidence"]
+        }
         state["history"].append(f"[{WORKER_NAME}] Đã tạo câu trả lời. Confidence: {result['confidence']}")
 
     except Exception as e:
+        state["error"] = {"code": "SYNTHESIS_FAILED", "reason": str(e)}
         state["final_answer"] = f"Lỗi tổng hợp: {str(e)}"
+        state["sources"] = []
+        state["confidence"] = 0.0
+        io_log["error"] = state["error"]
         state["history"].append(f"[{WORKER_NAME}] ERROR: {e}")
 
+    state["worker_io_logs"].append(io_log)
     return state
 
 # --- Test độc lập ---
