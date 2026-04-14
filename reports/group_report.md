@@ -4,15 +4,15 @@
 **Thành viên:**
 | Tên | Vai trò | Email |
 |-----|---------|-------|
-| Hoàng | Tech Lead | hoangmai04222@gmail.com |
+| Hoàng | Supervisor Owner | hoangmai04222@gmail.com |
 | Hưng | Tech Lead | hoangduchung0311@gmail.com |
 | Hồng Anh | Tech Lead | anh.anhle2004@gmail.com |
-| Hùng | Tech Lead | nguyenhoangviethung@gmail.com |
-| Giang | Worker Owners | nguyenhuonggiang06092004@gmail.com |
+| Hùng | Tech Lead, Worker Owner | nguyenhoangviethung@gmail.com |
+| Giang | Worker Owner | nguyenhuonggiang06092004@gmail.com |
 | Bình | Trace & Docs Owner | binhntph50046@gmail.com |
 
 **Ngày nộp:** 14/04/2026  
-**Repo:** https://github.com/nguyenhoangviethung/Nhom08-402-Day09.git
+**Repo:** https://github.com/nguyenhoangviethung/Nhom08-402-Day09
 **Độ dài khuyến nghị:** 600–1000 từ
 
 ---
