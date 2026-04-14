@@ -43,7 +43,7 @@
   "analysis": {
     "routing_visibility": "Day 09 có route_reason cho từng câu → dễ debug hơn Day 08",
     "latency_delta": "TODO: Điền delta latency thực tế",
-    "accuracy_delta": "TODO: Điền delta accuracy thực tế từ grading",
+    "accuracy_delta": "",
     "debuggability": "Multi-agent: có thể test từng worker độc lập. Single-agent: không thể.",
     "mcp_benefit": "Day 09 có thể extend capability qua MCP không cần sửa core. Day 08 phải hard-code."
   }
