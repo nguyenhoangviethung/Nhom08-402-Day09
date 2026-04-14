@@ -1,7 +1,13 @@
-# Day 09 Lab — Multi-Agent Orchestration
-# Install: pip install -r requirements.txt
+# Day 08 Lab — RAG Pipeline
+# Cài đặt: pip install -r requirements.txt
 
-# ─── Core ───────────────────────────────
+# === PyTorch CPU ===
+# Chỉ định nguồn tải PyTorch bản CPU để tránh tải bản CUDA nặng nề
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+
+# === Core ===
 python-dotenv>=1.0.0
 
 # ─── Vector Store ───────────────────────
@@ -9,6 +15,10 @@ chromadb>=0.4.22
 
 # ─── Embeddings ─────────────────────────
 # Option A: Sentence Transformers (offline, không cần API key)
+# Chỉ định nguồn tải PyTorch bản CPU để tránh tải bản CUDA nặng nề
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
 sentence-transformers>=2.6.0
 
 # ─── LLM ────────────────────────────────
@@ -20,19 +30,19 @@ openai>=1.12.0
 
 # ─── Orchestration ──────────────────────
 # Option: LangGraph (uncomment nếu dùng LangGraph)
-# langgraph>=0.1.0
-# langchain>=0.2.0
-# langchain-openai>=0.1.0
+langgraph>=0.1.0
+langchain>=0.2.0
+langchain-openai>=0.1.0
 
 # ─── Data ───────────────────────────────
 pyyaml>=6.0.1
 
 # ─── MCP (optional — Sprint 3 Bonus) ───
 # Uncomment nếu muốn implement real MCP server:
-# mcp>=1.0.0
-# httpx>=0.27.0
-# fastapi>=0.110.0
-# uvicorn>=0.27.0
+mcp>=1.0.0
+httpx>=0.27.0
+fastapi>=0.110.0
+uvicorn>=0.27.0
 
 # ─── Dev/Test ───────────────────────────
 pytest>=8.0.0
